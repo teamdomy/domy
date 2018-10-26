@@ -1,0 +1,55 @@
+{
+  "name": "domy-cli",
+  "version": "0.0.1",
+  "description": "Software Development Kit for Domy",
+  "private": false,
+  "author": "Dark Wasp Project",
+  "homepage": "https://darkwasp.com",
+  "main": "./backend/index.js",
+  "scripts": {
+    "build": "webpack -d",
+    "build:prod": "webpack -p",
+    "test": "mocha --reporter spec --require ts-node/register 'tests/**/*.spec.ts'",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "watch": "webpack -d --watch"
+  },
+  "keywords": [
+    "multithreading",
+    "distributed",
+    "thread",
+    "parallel",
+    "concurrent",
+    "worker",
+    "lambda",
+    "function",
+    "service"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dwproject/darkwasp"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.2",
+    "@types/sinon": "^5.0.1",
+    "@types/socket.io": "^1.4.34",
+    "babel-loader": "^8.0.0-beta.3",
+    "chai": "^4.1.2",
+    "copy-webpack-plugin": "^4.5.1",
+    "mocha": "^4.0.1",
+    "sinon": "^5.1.1",
+    "ts-loader": "^4.4.1",
+    "ts-node": "^6.1.1",
+    "tslint": "^5.10.0",
+    "typescript": "^2.9.2",
+    "uglifyjs-webpack-plugin": "^1.2.4",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^2.1.5"
+  },
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "socket.io": "^2.0.4"
+  }
+}

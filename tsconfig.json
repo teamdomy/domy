@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./build/",
+    "target": "es5",
+    "lib": ["DOM", "ES6"],
+    "module": "commonjs",
+    "allowJs": true,
+    "removeComments": true,
+    "sourceMap": true
+  },
+  "include": [
+    "src"
+  ],
+  "compileOnSave": false
+}
