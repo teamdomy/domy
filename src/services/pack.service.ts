@@ -19,6 +19,8 @@ export class PackService {
       const filename = segments.pop();
       const config = this.setup(segments);
 
+      // todo: create a list of allowed plugin
+      config.plugins = [];
       config.entry = entry;
       config.output = {
         path: "/output",
@@ -69,9 +71,15 @@ export class PackService {
 
       try {
         accessSync(pathway, constants.R_OK);
-
         // config file found
-        return module.require(pathway);
+        // temporary workaround
+        const config = eval("require")(pathway.trim());
+
+        if (Array.isArray(config)) {
+          return config[0];
+        } else {
+          return config;
+        }
       } catch (err) {
 
         segments.pop();

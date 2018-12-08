@@ -45,8 +45,6 @@ export class DomCommand {
           this.dm.get(trunk)
             .then(data => {
 
-              // What is the default path resolution for fs? It should the same as for module nodejs
-
               if (typeof args.file !== "undefined") {
                 this.dm.save(args.file, data)
                   .then(() => this.lg.success())
@@ -75,7 +73,7 @@ export class DomCommand {
   public add(): Command {
     this.cm.command("add")
       .alias("a")
-      .arguments("<name> <pathway>") // name is the component and path is the path to the file with component
+      .arguments("<name> <pathway>")
       .description("add the structure to the virtual dom")
       .action((name: string, pathway: string) => {
         if (
