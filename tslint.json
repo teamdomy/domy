@@ -32,7 +32,7 @@
     "no-console": [
       true,
       "debug",
-      "info",
+//      "info",
       "time",
       "timeEnd",
       "trace"
