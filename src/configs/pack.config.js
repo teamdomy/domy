@@ -1,4 +1,13 @@
+const path = require("path");
+
+function load(pathway) {
+  return path.join(__dirname, '..', 'node_modules', pathway);
+}
+
 module.exports = {
+  resolveLoader: {
+    modules: [path.join(__dirname, '..', 'node_modules')],
+  },
   module: {
     rules: [
       {
@@ -12,15 +21,20 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env", "@babel/react"],
-            plugins: [require("@babel/plugin-proposal-object-rest-spread")]
+            presets: [
+              load("@babel/preset-env"),
+              load("@babel/preset-react")],
+            plugins: [
+              load("@babel/plugin-proposal-object-rest-spread")
+            ]
           }
         }
       }
     ]
   },
   resolve: {
-    extensions: [ ".tsx", ".ts", ".jsx", ".js" ]
+    modules: [path.join(__dirname, '..', 'node_modules')],
+    extensions: [ ".tsx", ".ts", ".jsx", ".js" ],
   },
   externals: {
     "react": "React",
