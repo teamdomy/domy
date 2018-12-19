@@ -8,7 +8,6 @@ export class WebRepository {
    *
    * @param {string} type
    * @param {string} key
-   * @param {string} dir
    * @return {Function}
    */
   public wait(type: string, key: string): string {

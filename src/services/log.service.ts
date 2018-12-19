@@ -18,7 +18,7 @@ export class LogService {
       colors.green("done")
     );
     console.info(
-      pad("Procedure result:", 30),
+      pad("Operation result:", 30),
       colors.green("success")
     );
   }
@@ -39,7 +39,7 @@ export class LogService {
       colors.red("aborted")
     );
     console.error(
-      pad("Procedure result:", 30),
+      pad("Operation result:", 30),
       colors.red("failure")
     );
     console.error("DOMError: ", colors.yellow(error));

@@ -1,14 +1,15 @@
-import { accessSync, constants } from "fs";
+import { existsSync } from "fs";
 import webpack from "webpack";
 import Memory from "memory-fs";
 
 export class PackService {
 
   /**
-   * Bundles the content using Webpack
+   * Bundles the content using the Webpack
    *
    * @param {string} pathway
    * @param {string} name
+   * @return {Promise<Buffer>}
    */
   public create(pathway: string, name: string): Promise<Buffer> {
 
@@ -19,7 +20,6 @@ export class PackService {
       const filename = segments.pop();
       const config = this.setup(segments);
 
-      // todo: create a list of allowed plugin
       config.plugins = [];
       config.entry = entry;
       config.output = {
@@ -64,13 +64,12 @@ export class PackService {
    * @param {Array<string>} segments
    * @return any
    */
-  private setup(segments: string[]) {
+  private setup(segments: string[]): any {
 
     if (Array.isArray(segments) && segments.length > 0) {
       const pathway = segments.join("/") + "/webpack.config.js";
 
-      try {
-        accessSync(pathway, constants.R_OK);
+      if (existsSync(pathway)) {
         // config file found
         // temporary workaround
         const config = eval("require")(pathway.trim());
@@ -80,11 +79,11 @@ export class PackService {
         } else {
           return config;
         }
-      } catch (err) {
-
+      } else {
         segments.pop();
         return this.setup(segments);
       }
+
     } else {
       // config file was not found, returning default config
       return module.require("../configs/pack.config.js");

@@ -5,7 +5,7 @@ import { join } from "path";
 export class LocalRepository {
 
   /**
-   * Returns the current user credentials
+   * Returns current user credentials
    *
    * @return {Promise<config>}
    */
