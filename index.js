@@ -1,0 +1,1 @@
+module.exports = require("val-loader!lib/core");

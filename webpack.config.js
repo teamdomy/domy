@@ -74,6 +74,7 @@ const backend = {
       raw: true
     }),
     new Copy([
+      "index.js",
       "package.json",
       "README.md",
       "CHANGELOG.md",
