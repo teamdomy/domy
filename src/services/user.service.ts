@@ -1,14 +1,15 @@
 import env from "../../env/dev.env.json";
+import chat from "../configs/chat.config";
 import { prompt } from "inquirer";
-import { DataService } from "./data.service";
+import { HttpRepository } from "../repositories/http.repository";
+import { LocalRepository } from "../repositories/local.repository";
+import { join } from "path";
 
 export class UserService {
 
-  public app: string;
-  public token: string;
-
   constructor(
-    private dt = new DataService()
+    private hr = new HttpRepository(),
+    private lr = new LocalRepository()
   ) {
 
   }
@@ -19,16 +20,14 @@ export class UserService {
    * @param {string} user
    * @param {string} pass
    * @param {string} mail
-   * @param {string} app
    * @return {Promise<boolean>}
    */
-  public signup(user: string, pass: string, mail: string, app: string): Promise<boolean> {
-    return this.dt.post(
-      "usr",
-      "signup",
-      app,
-      { user: user, pass: pass, mail: mail }
-      ).then(token => this.persist(app, token));
+  public signup(user: string, pass: string, mail: string): Promise<boolean> {
+
+    const value = { user: user, pass: pass, mail: mail };
+
+    return this.hr.post("usr", "signup", value)
+      .then(token => this.persist(user, token));
   }
 
   /**
@@ -36,51 +35,14 @@ export class UserService {
    *
    * @param {string} user
    * @param {string} pass
-   * @param {string} app
    * @return {Promise<boolean>}
    */
-  public login(user: string, pass: string, app: string): Promise<boolean> {
-    return this.dt.post(
-      "usr",
-      "login",
-      app,
-      { user: user, pass: pass }
-    ).then(token => this.persist(app, token));
-  }
+  public login(user: string, pass: string): Promise<boolean> {
 
-  /**
-   * Saves credentials in the file
-   *
-   * @param {string} app
-   * @param {string} token
-   * @return {Promise<boolean>}
-   */
-  public persist(app: string, token: string): Promise<boolean> {
-    if (
-      typeof app !== "undefined" &&
-      typeof token !== "undefined"
-    ) {
+    const value = { user: user, pass: pass };
 
-      this.app = app;
-      this.token = token;
-
-      const data = Buffer.from(
-        JSON.stringify({
-          app: this.app,
-          token: this.token
-        })
-      );
-
-      return this.dt.write(
-        env.config,
-        data.toString("base64")
-      );
-
-    } else {
-      throw Error(
-        "Incomplete credentials"
-      );
-    }
+    return this.hr.post("usr", "login", value)
+      .then(token => this.persist(user, token));
   }
 
   /**
@@ -89,55 +51,47 @@ export class UserService {
    * @param {string} type
    * @return {Promise<any>}
    */
-  public ask(type: string): Promise<any> {
-
-    let response;
-
+  public inquire(type: string): Promise<any> {
     if (type === "login") {
-      response = prompt([
-        {
-          type: "input",
-          name: "username",
-          message: "Enter the username"
-        },
-        {
-          type: "input",
-          name: "password",
-          message: "Enter the password"
-        },
-        {
-          type: "input",
-          name: "email",
-          message: "Enter the email",
-        },
-        {
-          type: "input",
-          name: "app",
-          message: "Enter your app name"
-        }
-      ]);
+      return prompt(chat.login);
     } else if (type === "signup") {
-      response = prompt([
-        {
-          type: "input",
-          name: "username",
-          message: "Enter the username"
-        },
-        {
-          type: "input",
-          name: "password",
-          message: "Enter the password"
-        },
-        {
-          type: "input",
-          name: "app",
-          message: "Enter your app name"
-        }
-      ]);
+      return prompt(chat.signup);
     } else {
       throw new Error("Wrong inquiry option");
     }
+  }
 
-    return response;
+  /**
+   * Saves the credential in the file
+   *
+   * @param {string} user
+   * @param {string} token
+   * @return {Promise<boolean>}
+   */
+  public persist(user: string, token: string) {
+    if (
+      typeof user !== "undefined" &&
+      typeof token !== "undefined"
+    ) {
+
+      return Promise.all([
+        this.lr.write(
+          join(__dirname, env.key),
+          JSON.stringify(
+            Buffer.from(token).toString()
+          )
+        ),
+        this.lr.write(
+          join(__dirname, env.user),
+          JSON.stringify({
+            user: user,
+            dir: user
+          })
+        )
+      ]).then(result => result[0] && result[1]);
+
+    } else {
+      throw Error("Incomplete credentials");
+    }
   }
 }
