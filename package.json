@@ -1,6 +1,6 @@
 {
   "name": "domy-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The cloud DOM and a package manager for components",
   "private": false,
   "homepage": "https://domy.io",
@@ -56,6 +56,7 @@
     "pad": "^2.2.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "val-loader": "^1.1.1",
     "webpack": "^4.27.1"
   }
 }

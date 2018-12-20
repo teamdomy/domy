@@ -18,7 +18,9 @@ const common = {
           loader: "babel-loader",
           options: {
             presets: ["@babel/preset-env"],
-            plugins: [require("@babel/plugin-proposal-object-rest-spread")]
+            plugins: [
+              "@babel/plugin-proposal-object-rest-spread"
+            ]
           }
         }
       }
@@ -28,36 +30,6 @@ const common = {
   resolve: {
     extensions: [ ".tsx", ".ts", ".js" ]
   }
-};
-
-const frontend = {
-  entry: {
-    core: "./src/proxies/dom.proxy"
-  },
-  output: {
-    path: path.resolve(__dirname, "build"),
-    filename: "lib/[name].js",
-    libraryTarget: "commonjs2",
-    library: "domy",
-  },
-  externals: {
-    "react": "React",
-    "react-dom": "ReactDOM"
-  },
-  plugins: [
-    new Uglify({
-      sourceMap: false,
-      uglifyOptions: {
-        minimize: true,
-        compress: true,
-        output: {
-          comments: false,
-          beautify: false
-        }
-      }
-    })
-  ],
-  target: "web"
 };
 
 const backend = {
@@ -120,6 +92,5 @@ const backend = {
 };
 
 module.exports = [
-  Object.assign(frontend, common),
   Object.assign(backend, common)
 ];

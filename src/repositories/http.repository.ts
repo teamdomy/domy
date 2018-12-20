@@ -1,8 +1,8 @@
-import http from "http";
+import { request } from "http";
 import env from "../../env/dev.env.json";
 import { LocalRepository } from "./local.repository";
 
-export class NodeRepository {
+export class HttpRepository {
 
   constructor(
     private lr = new LocalRepository()
@@ -27,9 +27,6 @@ export class NodeRepository {
       return this.request({
         method: "GET",
         path: this.lr.sign(type, index, key),
-        headers: {
-          "X-Domy-Origin": "node"
-        }
       });
     });
 
@@ -123,6 +120,37 @@ export class NodeRepository {
   }
 
   /**
+   * Blocks the http get request
+   *
+   * @deprecated since version 0.5.0
+   *
+   * on the feature approval:
+   * - remove the loop
+   * - move it to the separate process
+   *
+   * @param {string} type
+   * @param {string} dir
+   * @param {string} key
+   * @return {string}
+   */
+  public wait(type: string, dir: string, key: string): string {
+
+    let response: string;
+
+    this.get(type, dir, key)
+      .then(data => response = data);
+
+    setTimeout(() => {
+      response = "domy:timeout";
+      throw new Error("Load timeout for component");
+    }, 3000);
+
+    while (!response) {}
+
+    return response;
+  }
+
+  /**
    * Wraps the http request
    *
    * @param {any} options
@@ -135,7 +163,7 @@ export class NodeRepository {
     options.hostname = env.host;
 
     return new Promise((resolve, reject) => {
-      const request = http.request(options, response => {
+      const query = request(options, response => {
         if (response.statusCode === 200) {
           let result = "";
           response.setEncoding("utf8");
@@ -147,13 +175,13 @@ export class NodeRepository {
         }
       });
 
-      request.on("error", error => reject(error));
+      query.on("error", error => reject(error));
 
       if (data) {
-        request.write(data);
+        query.write(data);
       }
 
-      request.end();
+      query.end();
     });
   }
 
