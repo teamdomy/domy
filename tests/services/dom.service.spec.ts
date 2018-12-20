@@ -1,57 +1,62 @@
 import { expect } from "chai";
 import { stub } from "sinon";
 import { DomService } from "../../src/services/dom.service";
-import { DataService } from "../../src/services/data.service";
+import { HttpRepository } from "../../src/repositories/http.repository";
+import { LocalRepository } from "../../src/repositories/local.repository";
 
 describe("DomService", () => {
 
   const service = new DomService();
 
-  let datastub;
-  let recordstub;
+  let nodestub;
+  let localstub;
 
   beforeEach(() => {
-    datastub = stub(DataService.prototype, "request");
-    recordstub = stub(DataService.prototype, "getRecord")
-      .returns(
+    nodestub = stub(HttpRepository.prototype, "request");
+    localstub = stub(LocalRepository.prototype, "credentials")
+      .get(() =>
         Promise.resolve({
-          app: "test_app",
-          token: "test_token"
+          token: "test_token",
+          user: {
+            user: "test_user",
+            dir: "test_user"
+          }
         })
       );
   });
 
   afterEach(() => {
-    datastub.restore();
-    recordstub.restore();
+    nodestub.restore();
+    localstub.restore();
   });
 
   it("get() should return string", done => {
 
-    datastub.callsFake(options => {
+    nodestub.callsFake(options => {
       expect(options.method).to.equal("GET");
       expect(options.path).to.be.a("string");
+      expect(options.path).to.contain("test_user");
       expect(options.path).to.contain("Example");
-      expect(options.port).to.be.a("number");
 
       return Promise.resolve(
         JSON.stringify("test_content")
       );
     });
 
-    service.get("Example").then(result => {
-      expect(result).to.equal("test_content");
-      done();
-    });
+    service.get(undefined, "Example")
+      .then(result => {
+        expect(result).to.equal("test_content");
+        done();
+      });
   });
 
   it("set() should return boolean", done => {
 
-    datastub.callsFake((options, content) => {
+    nodestub.callsFake((options, content) => {
       expect(options.method).to.equal("PUT");
       expect(options.path).to.be.a("string");
+      expect(options.path).to.contain("dir");
       expect(options.path).to.contain("Example");
-      expect(options.port).to.be.a("number");
 
       expect(JSON.parse(content)).to.equal("test_content");
 
@@ -60,7 +65,7 @@ describe("DomService", () => {
       );
     });
 
-    service.set("Example", "test_content")
+    service.set("dir", "Example", "test_content")
       .then(result => {
         expect(JSON.parse(result)).to.be.true;
         done();
@@ -69,19 +74,20 @@ describe("DomService", () => {
 
   it("del() should return boolean", done => {
 
-    datastub.callsFake(options => {
+    nodestub.callsFake(options => {
       expect(options.method).to.equal("DELETE");
       expect(options.path).to.be.a("string");
+      expect(options.path).to.contain("dir");
       expect(options.path).to.contain("Example");
-      expect(options.port).to.be.a("number");
 
       return Promise.resolve(true);
     });
 
-    service.del("Example").then(result => {
-      expect(result).to.be.true;
-      done();
-    });
+    service.del("dir", "Example")
+      .then(result => {
+        expect(result).to.be.true;
+        done();
+      });
   });
 
 });

@@ -36,28 +36,20 @@ export class DomCommand {
   public get(): Command {
     this.cm.command("get")
       .alias("g")
-      .arguments("<trunk>")
-      .description("extract the structure from the virtual dom")
-      .option("-f --file [pathway]") // path to the file
-      .action((trunk: string, args: { file: string }) => {
-        if (typeof trunk === "string") {
-
-          this.dm.get(trunk)
-            .then(data => {
-
-              if (typeof args.file !== "undefined") {
-                this.dm.save(args.file, data)
-                  .then(() => this.lg.success())
-                  .catch(err => this.lg.failure(err));
-              } else {
-                console.info(data);
-              }
-            })
+      .arguments("<name>")
+      .description("get the component by its name")
+      // path to the dir where file will be created
+      .option("-f --file <pathway>")
+      .option("-d --dir <pathway>")
+      .action((name: string, args: { file: string, dir: string }) => {
+        if (typeof name === "string") {
+          this.dm.get(args.dir, name)
+            .then(data => this.dm.save(args.dir, name, args.file, data))
+            .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
-
         } else {
           this.lg.failure(
-            "Method expects the parameter to be a string"
+            "Wrong command-line arguments"
           );
         }
       });
@@ -74,20 +66,21 @@ export class DomCommand {
     this.cm.command("add")
       .alias("a")
       .arguments("<name> <pathway>")
-      .description("add the structure to the virtual dom")
-      .action((name: string, pathway: string) => {
-        if (
-          typeof name === "string" &&
-          typeof pathway === "string"
-        ) {
-
+      .description("add the component from the file")
+      // ignore all local conf and use the defpack straight away
+      .option("-i --ignore")
+      .option("-d --dir <pathway>")
+      .action((name: string, pathway: string, args: { dir: string }) => {
+        if (typeof name === "string" && typeof pathway === "string") {
           this.pk.create(pathway, name)
-            .then(content => this.dm.set(name, content.toString("utf8")))
+            .then(content =>
+              this.dm.set(args.dir, name, content.toString("utf8"))
+            )
             .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
         } else {
           this.lg.failure(
-            "Method expects both parameters to be strings"
+            "Wrong command-line arguments"
           );
         }
       });
@@ -101,18 +94,19 @@ export class DomCommand {
    * @return {Command}
    */
   public del(): Command {
-    this.cm.command("remove")
-      .alias("delete")
-      .arguments("<trunk>")
-      .description("remove the structure from the virtual dom")
-      .action((trunk: string) => {
-        if (typeof trunk === "string") {
-          this.dm.del(trunk)
+    this.cm.command("del")
+      .alias("d")
+      .arguments("<name>")
+      .description("remove the component by its name")
+      .option("-d --dir <pathway>")
+      .action((name: string, args: { dir: string }) => {
+        if (typeof name === "string") {
+          this.dm.del(args.dir, name)
             .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
         } else {
           this.lg.failure(
-            "Method expects both parameters to be strings"
+            "Wrong command-line arguments"
           );
         }
       });
