@@ -25,7 +25,7 @@ export class PackService {
       config.output = {
         path: "/output",
         filename: "component.js",
-        libraryTarget: "var",
+        libraryTarget: "commonjs2",
         library: name
       };
 

@@ -34,11 +34,12 @@ const common = {
 
 const backend = {
   entry: {
-    "cli": "./src/main.ts",
+    "bin/cli": "./src/main.ts",
+    "lib/core": "./src/proxies/dom.proxy.ts"
   },
   output: {
     path: path.resolve(__dirname, "build"),
-    filename: "bin/[name].js",
+    filename: "[name].js",
     libraryTarget: "commonjs2",
     library: "domy-cli"
   },

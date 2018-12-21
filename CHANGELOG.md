@@ -1,6 +1,2 @@
-## 0.0.2 
-* Added basic services
-
-# 0.0.3
-* dom & user services
-* config files
+## 0.4.0
+* alpha release
