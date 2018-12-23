@@ -1,6 +1,6 @@
 {
   "name": "domy-cli",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "The cloud DOM and a package manager for components",
   "private": false,
   "homepage": "https://domy.io",

@@ -1,11 +1,11 @@
-import { request } from "http";
+import { IncomingMessage, RequestOptions, request } from "http";
 import env from "../../env/dev.env.json";
-import { LocalRepository } from "./local.repository";
+import { FileService } from "./file.service";
 
-export class HttpRepository {
+export class HttpService {
 
   constructor(
-    private lr = new LocalRepository()
+    private fl = new FileService()
   ) {
 
   }
@@ -20,13 +20,13 @@ export class HttpRepository {
    */
   public get(type: string, dir: string, key: string): Promise<string> {
 
-    return this.lr.credentials.then(config => {
+    return this.fl.credentials.then(config => {
 
-      const index = dir ? dir : config.user.dir;
+      const index = dir ? dir : config.dir;
 
       return this.request({
         method: "GET",
-        path: this.lr.sign(type, index, key),
+        path: this.fl.sign(type, index, key),
       });
     });
 
@@ -45,14 +45,14 @@ export class HttpRepository {
   public put(type: string, dir: string, key: string, value: any): Promise<string> {
 
     if (typeof value !== "undefined") {
-      return this.lr.credentials.then(config => {
+      return this.fl.credentials.then(config => {
 
-        const index = dir ? dir : config.user.dir;
+        const index = dir ? dir : config.dir;
         const data = JSON.stringify(value);
 
         return this.request({
           method: "PUT",
-          path: this.lr.sign(type, index, key),
+          path: this.fl.sign(type, index, key),
           headers: {
             "Content-Type": "application/json",
             "Content-Length": Buffer.byteLength(data),
@@ -105,49 +105,18 @@ export class HttpRepository {
    */
   public delete(type: string, dir: string, key: string): Promise<string> {
 
-    return this.lr.credentials.then(config => {
+    return this.fl.credentials.then(config => {
 
-      const index = dir ? dir : config.user.dir;
+      const index = dir ? dir : config.dir;
 
       return this.request({
         method: "DELETE",
-        path: this.lr.sign(type, index, key),
+        path: this.fl.sign(type, index, key),
         headers: {
           "X-Domy-Token": config.token
         }
       });
     });
-  }
-
-  /**
-   * Blocks the http get request
-   *
-   * @deprecated since version 0.5.0
-   *
-   * on the feature approval:
-   * - remove the loop
-   * - move it to the separate process
-   *
-   * @param {string} type
-   * @param {string} dir
-   * @param {string} key
-   * @return {string}
-   */
-  public wait(type: string, dir: string, key: string): string {
-
-    let response: string;
-
-    this.get(type, dir, key)
-      .then(data => response = data);
-
-    setTimeout(() => {
-      response = "domy:timeout";
-      throw new Error("Load timeout for component");
-    }, 3000);
-
-    while (!response) {}
-
-    return response;
   }
 
   /**
@@ -157,13 +126,13 @@ export class HttpRepository {
    * @param {any} data
    * @return {Promise<string>}
    */
-  public request(options, data?): Promise<string> {
+  public request(options: RequestOptions, data?: any): Promise<string> {
 
     options.port = env.port;
     options.hostname = env.host;
 
     return new Promise((resolve, reject) => {
-      const query = request(options, response => {
+      const query = request(options, (response: IncomingMessage) => {
         if (response.statusCode === 200) {
           let result = "";
           response.setEncoding("utf8");

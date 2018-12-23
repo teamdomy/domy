@@ -2,32 +2,49 @@ import env from "../../env/dev.env.json";
 import { readFile, writeFile } from "fs";
 import { join } from "path";
 
-export class LocalRepository {
+export class FileService {
 
   /**
    * Returns current user credentials
    *
    * @return {Promise<config>}
    */
-  public get credentials(): Promise<{token: string, user: any}> {
-    return Promise.all([
-      this.read(join(__dirname, env.key)),
-      this.read(join(__dirname, env.user))
-    ]).then(data => {
-      if (
-        data[0] instanceof Buffer &&
-        data[1] instanceof Buffer
-      ) {
+  public get credentials(): Promise<any> {
+      return this.read(join(__dirname, env.user))
+        .then(data => {
+          if (data) {
+            return JSON.parse(data.toString());
+          } else {
+            throw new Error("User is not authenticated");
+          }
+        });
+  }
 
-        return {
-          token: JSON.parse(data[0].toString()),
-          user: JSON.parse(data[1].toString())
-        };
-        // return Buffer.from(data.toString()).toString();
-      } else {
-        throw new Error("User is not authenticated");
-      }
-    });
+  /**
+   * Persists locally user credentials
+   *
+   * @param {string} user
+   * @param {string} token
+   * @return {Promise<boolean>}
+   */
+  public persist(user: string, token: string) {
+    if (
+      typeof user !== "undefined" &&
+      typeof token !== "undefined"
+    ) {
+
+      return this.write(
+        join(__dirname, env.user),
+        JSON.stringify({
+          user: user,
+          dir: user,
+          key: token
+        })
+      );
+
+    } else {
+      throw Error("Incomplete credentials");
+    }
   }
 
   /**

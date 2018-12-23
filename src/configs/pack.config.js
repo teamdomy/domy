@@ -5,9 +5,6 @@ function load(pathway) {
 }
 
 module.exports = {
-  resolveLoader: {
-    modules: [path.join(__dirname, '..', 'node_modules')],
-  },
   module: {
     rules: [
       {
@@ -36,11 +33,13 @@ module.exports = {
     modules: [path.join(__dirname, '..', 'node_modules')],
     extensions: [ ".tsx", ".ts", ".jsx", ".js" ],
   },
+  resolveLoader: {
+    modules: [path.join(__dirname, '..', 'node_modules')],
+  },
   externals: {
     "react": "React",
+    "redux": "Redux",
     "react-dom": "ReactDOM"
   },
   target: "web",
-  entry: {},
-  output: {}
 };

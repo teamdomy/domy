@@ -17,7 +17,9 @@ const common = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env"],
+            presets: [
+              "@babel/preset-env"
+            ],
             plugins: [
               "@babel/plugin-proposal-object-rest-spread"
             ]
@@ -32,29 +34,24 @@ const common = {
   }
 };
 
-const backend = {
+const config = {
   entry: {
-    "bin/cli": "./src/main.ts",
-    "lib/core": "./src/proxies/dom.proxy.ts"
+    "cli": "./src/main.ts",
+
   },
   output: {
     path: path.resolve(__dirname, "build"),
-    filename: "[name].js",
+    filename: "bin/[name].js",
     libraryTarget: "commonjs2",
     library: "domy-cli"
   },
   externals: {
-    fs: "fs",
-    path: "path",
-    http: "http",
+    pad: "pad",
     colors: "colors",
     commander: "commander",
     inquirer: "inquirer",
-    pad: "pad",
     webpack: "webpack",
     "memory-fs": "memory-fs",
-    "../configs/user.config.json": "../configs/user.config.json",
-    "../configs/key.config.json": "../configs/key.config.json",
     "../configs/pack.config.js": "../configs/pack.config.js",
     "../configs/chat.config.js": "../configs/chat.config.js"
   },
@@ -75,13 +72,10 @@ const backend = {
       raw: true
     }),
     new Copy([
-      "index.js",
       "package.json",
       "README.md",
       "CHANGELOG.md",
       "LICENSE.md",
-      { from: "src/configs/user.config.json", to: "configs/user.config.json"},
-      { from: "src/configs/key.config.json", to: "configs/key.config.json"},
       { from: "src/configs/pack.config.js", to: "configs/pack.config.js"},
       { from: "src/configs/chat.config.js", to: "configs/chat.config.js"}
     ])
@@ -94,5 +88,5 @@ const backend = {
 };
 
 module.exports = [
-  Object.assign(backend, common)
+  Object.assign(config, common)
 ];
