@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { stub } from "sinon";
 import { DomService } from "../../src/services/dom.service";
-import { HttpRepository } from "../../src/repositories/http.repository";
-import { LocalRepository } from "../../src/repositories/local.repository";
+import { HttpService } from "../../src/services/http.service";
+import { FileService } from "../../src/services/file.service";
 
 describe("DomService", () => {
 
@@ -12,15 +12,13 @@ describe("DomService", () => {
   let localstub;
 
   beforeEach(() => {
-    nodestub = stub(HttpRepository.prototype, "request");
-    localstub = stub(LocalRepository.prototype, "credentials")
+    nodestub = stub(HttpService.prototype, "request");
+    localstub = stub(FileService.prototype, "credentials")
       .get(() =>
         Promise.resolve({
-          token: "test_token",
-          user: {
-            user: "test_user",
-            dir: "test_user"
-          }
+          user: "test_user",
+          key: "test_key",
+          dir: "test_user"
         })
       );
   });

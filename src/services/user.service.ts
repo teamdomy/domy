@@ -1,15 +1,13 @@
-import env from "../../env/dev.env.json";
 import chat from "../configs/chat.config";
 import { prompt } from "inquirer";
-import { HttpRepository } from "../repositories/http.repository";
-import { LocalRepository } from "../repositories/local.repository";
-import { join } from "path";
+import { HttpService } from "./http.service";
+import { FileService } from "./file.service";
 
 export class UserService {
 
   constructor(
-    private hr = new HttpRepository(),
-    private lr = new LocalRepository()
+    private ht = new HttpService(),
+    private fl = new FileService()
   ) {
 
   }
@@ -26,8 +24,8 @@ export class UserService {
 
     const value = { user: user, pass: pass, mail: mail };
 
-    return this.hr.post("usr", "signup", value)
-      .then(token => this.persist(user, token));
+    return this.ht.post("usr", "signup", value)
+      .then(token => this.fl.persist(user, token));
   }
 
   /**
@@ -41,8 +39,8 @@ export class UserService {
 
     const value = { user: user, pass: pass };
 
-    return this.hr.post("usr", "login", value)
-      .then(token => this.persist(user, token));
+    return this.ht.post("usr", "login", value)
+      .then(token => this.fl.persist(user, token));
   }
 
   /**
@@ -58,40 +56,6 @@ export class UserService {
       return prompt(chat.signup);
     } else {
       throw new Error("Wrong inquiry option");
-    }
-  }
-
-  /**
-   * Saves the credential in the file
-   *
-   * @param {string} user
-   * @param {string} token
-   * @return {Promise<boolean>}
-   */
-  public persist(user: string, token: string) {
-    if (
-      typeof user !== "undefined" &&
-      typeof token !== "undefined"
-    ) {
-
-      return Promise.all([
-        this.lr.write(
-          join(__dirname, env.key),
-          JSON.stringify(
-            Buffer.from(token).toString()
-          )
-        ),
-        this.lr.write(
-          join(__dirname, env.user),
-          JSON.stringify({
-            user: user,
-            dir: user
-          })
-        )
-      ]).then(result => result[0] && result[1]);
-
-    } else {
-      throw Error("Incomplete credentials");
     }
   }
 }

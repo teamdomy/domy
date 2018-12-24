@@ -1,6 +1,6 @@
 {
   "name": "domy-cli",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The cloud DOM and a package manager for components",
   "private": false,
   "homepage": "https://domy.io",
@@ -8,7 +8,6 @@
   "bin": {
     "domy": "./bin/cli.js"
   },
-  "main": "./index.js",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

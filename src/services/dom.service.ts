@@ -1,12 +1,12 @@
-import { HttpRepository } from "../repositories/http.repository";
-import { LocalRepository } from "../repositories/local.repository";
+import { HttpService } from "./http.service";
+import { FileService } from "./file.service";
 import { existsSync, mkdirSync } from "fs";
 
 export class DomService {
 
   constructor(
-    private hr = new HttpRepository(),
-    private lr = new LocalRepository()
+    private ht = new HttpService(),
+    private fl = new FileService()
   ) {
 
   }
@@ -19,7 +19,7 @@ export class DomService {
    * @return {Promise<string>}
    */
   public get(dir: string, name: string): Promise<string> {
-    return this.hr.get("dom", dir, name)
+    return this.ht.get("dom", dir, name)
       .then(data => {
         if (data) {
           return JSON.parse(data);
@@ -38,7 +38,7 @@ export class DomService {
    * @return {Promise<string>}
    */
   public set(dir: string, name: string, content: string): Promise<string> {
-    return this.hr.put("dom", dir, name, content);
+    return this.ht.put("dom", dir, name, content);
   }
 
   /**
@@ -49,7 +49,7 @@ export class DomService {
    * @return {Promise<string>}
    */
   public del(dir: string, name: string): Promise<string> {
-    return this.hr.delete("dom", dir, name);
+    return this.ht.delete("dom", dir, name);
   }
 
   /**
@@ -93,7 +93,7 @@ export class DomService {
 
     address += "/" + name + ".js";
 
-    return this.lr.write(address, content);
+    return this.fl.write(address, content);
   }
 
   /**

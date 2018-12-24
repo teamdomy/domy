@@ -1,21 +1,27 @@
 import { expect } from "chai";
 import { stub } from "sinon";
 import { UserService } from "../../src/services/user.service";
-import { HttpRepository } from "../../src/repositories/http.repository";
+import { HttpService } from "../../src/services/http.service";
+import { FileService } from "../../src/services/file.service";
 
 describe("UserService", () => {
 
   const service = new UserService();
 
+  const name = "test_user";
+  const pass = "test_pass";
+  const key = "test_token";
+  const mail = "test@email.te";
+
   let nodeStub;
   let persiststub;
 
   beforeEach(() => {
-    nodeStub = stub(HttpRepository.prototype, "request");
-    persiststub = stub(UserService.prototype, "persist")
+    nodeStub = stub(HttpService.prototype, "request");
+    persiststub = stub(FileService.prototype, "persist")
       .callsFake((user, token) => {
-        expect(user).to.equal("test_user");
-        expect(token).to.equal("test_token");
+        expect(user).to.equal(name);
+        expect(token).to.equal(key);
         return Promise.resolve(true);
       });
   });
@@ -34,17 +40,17 @@ describe("UserService", () => {
 
       const content = JSON.parse(data);
 
-      expect(content.user).to.equal("test_user");
-      expect(content.pass).to.equal("test_pass");
-      expect(content.mail).to.equal("test@email.te");
+      expect(content.user).to.equal(name);
+      expect(content.pass).to.equal(pass);
+      expect(content.mail).to.equal(mail);
 
-      return Promise.resolve("test_token");
+      return Promise.resolve(key);
     });
 
     service.signup(
-      "test_user",
-      "test_pass",
-      "test@email.te"
+      name,
+      pass,
+      mail
     ).then(result => {
       expect(result).to.be.true;
       done();
@@ -60,15 +66,15 @@ describe("UserService", () => {
 
       const content = JSON.parse(data);
 
-      expect(content.user).to.equal("test_user");
-      expect(content.pass).to.equal("test_pass");
+      expect(content.user).to.equal(name);
+      expect(content.pass).to.equal(pass);
 
-      return Promise.resolve("test_token");
+      return Promise.resolve(key);
     });
 
     service.login(
-      "test_user",
-      "test_pass"
+      name,
+      pass
     ).then(result => {
       expect(result).to.be.true;
       done();
