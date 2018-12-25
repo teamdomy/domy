@@ -1,10 +1,11 @@
 import { prompt } from "inquirer";
 import { expect } from "chai";
-import { stub, replace, fake } from "sinon";
+import { stub } from "sinon";
 import { UserCommand } from "../../src/commands/user.command";
-import { HttpRepository } from "../../src/repositories/http.repository";
+import { HttpService } from "../../src/services/http.service";
 import { LogService } from "../../src/services/log.service";
 import { UserService } from "../../src/services/user.service";
+import { FileService } from "../../src/services/file.service";
 
 describe("UserCommand", () => {
 
@@ -16,8 +17,8 @@ describe("UserCommand", () => {
   let inqstub;
 
   beforeEach(() => {
-    nodestub = stub(HttpRepository.prototype, "request");
-    persiststub = stub(UserService.prototype, "persist")
+    nodestub = stub(HttpService.prototype, "request");
+    persiststub = stub(FileService.prototype, "persist")
       .callsFake((user, token) => {
         expect(user).to.equal("test_user");
         expect(token).to.equal("test_token");

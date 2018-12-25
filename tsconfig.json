@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./build/",
     "target": "es2016",
-    "lib": ["DOM", "ES6"],
+    "lib": ["dom", "es6"],
     "module": "commonjs",
     "allowJs": true,
     "removeComments": true,

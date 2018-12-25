@@ -6,7 +6,7 @@ export class UserCommand {
 
   constructor(
     private cm = new Command(),
-    private ls = new LogService(),
+    private lg = new LogService(),
     private us = new UserService()
   ) {
 
@@ -33,7 +33,7 @@ export class UserCommand {
   public signup(): Command {
     this.cm.command("signup")
       .alias("s")
-      .description("create your own account")
+      .description("registers the user in the system")
       .action(() => {
         this.us.inquire("signup").then(data => {
 
@@ -53,20 +53,20 @@ export class UserCommand {
               ) {
 
                 this.us.signup(data.username, data.password, data.email)
-                  .then(result => this.ls.success())
-                  .catch(err => this.ls.failure(err));
+                  .then(result => this.lg.success())
+                  .catch(err => this.lg.failure(err));
               } else {
-                this.ls.failure(
+                this.lg.failure(
                   "Expecting username and password to be at least 5 characters long"
                 );
               }
             } else {
-              this.ls.failure(
+              this.lg.failure(
                 "Expecting an alphanumeric username and a valid email"
               );
             }
           } else {
-            this.ls.failure(
+            this.lg.failure(
               "Wrong command-line arguments"
             );
           }
@@ -85,7 +85,7 @@ export class UserCommand {
   public login(): Command {
     this.cm.command("login")
       .alias("l")
-      .description("log into the system")
+      .description("logs the user in the system")
       .action(() => {
         this.us.inquire("login").then(data => {
 
@@ -104,21 +104,21 @@ export class UserCommand {
               ) {
 
                 this.us.login(data.username, data.password)
-                  .then(() => this.ls.success())
-                  .catch(err => this.ls.failure(err));
+                  .then(() => this.lg.success())
+                  .catch(err => this.lg.failure(err));
 
               } else {
-                this.ls.failure(
+                this.lg.failure(
                   "Expecting username and password to be at least 5 characters long"
                 );
               }
             } else {
-              this.ls.failure(
+              this.lg.failure(
                 "Expecting an alphanumeric username"
               );
             }
           } else {
-            this.ls.failure(
+            this.lg.failure(
               "Wrong command-line arguments"
             );
           }

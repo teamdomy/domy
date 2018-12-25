@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import { stub } from "sinon";
 import { DomCommand } from "../../src/commands/dom.command";
-import { HttpRepository } from "../../src/repositories/http.repository";
+import { HttpService } from "../../src/services/http.service";
 import { PackService } from "../../src/services/pack.service";
 import { LogService } from "../../src/services/log.service";
-import { LocalRepository } from "../../src/repositories/local.repository";
+import { FileService } from "../../src/services/file.service";
 import { DomService } from "../../src/services/dom.service";
 
 describe("DomCommand", () => {
@@ -18,16 +18,14 @@ describe("DomCommand", () => {
 
   beforeEach(() => {
     logstub = stub(LogService.prototype, "success");
-    nodestub = stub(HttpRepository.prototype, "request");
+    nodestub = stub(HttpService.prototype, "request");
     domstub = stub(DomService.prototype, "save");
-    localstub = stub(LocalRepository.prototype, "credentials")
+    localstub = stub(FileService.prototype, "credentials")
       .get(() =>
         Promise.resolve({
-          token: "test_token",
-          user: {
-            user: "test_user",
-            dir: "test_user"
-          }
+          user: "test_user",
+          key: "test_token",
+          dir: "test_user"
         })
       );
   });
@@ -39,7 +37,7 @@ describe("DomCommand", () => {
     localstub.restore();
   });
 
-  it("get() should return string", done => {
+  it("install() should return string", done => {
 
     nodestub.callsFake(options => {
       expect(options.method).to.equal("GET");
@@ -65,12 +63,12 @@ describe("DomCommand", () => {
       done();
     });
 
-    command.get().parse(
-      ["node", "domy", "get", "Example"]
+    command.install().parse(
+      ["node", "domy", "install", "Example"]
     );
   });
 
-  it("add() should return boolean", done => {
+  it("publish() should return boolean", done => {
 
     logstub.callsFake(() => {
       done();
@@ -91,12 +89,12 @@ describe("DomCommand", () => {
       return Promise.resolve(true);
     });
 
-    command.add().parse(
-      ["node", "domy", "add", "Example", "example.js"]
+    command.publish().parse(
+      ["node", "domy", "publish", "Example", "example.js"]
     );
   });
 
-  it("del() should return boolean", done => {
+  it("unpublish() should return boolean", done => {
 
     logstub.callsFake(() => {
       done();
@@ -111,8 +109,8 @@ describe("DomCommand", () => {
       return Promise.resolve(true);
     });
 
-    command.del().parse(
-      ["node", "domy", "del", "Example"]
+    command.unpublish().parse(
+      ["node", "domy", "unpublish", "Example"]
     );
   });
 

@@ -8,8 +8,8 @@ export class DomCommand {
   constructor(
     private cm = new Command(),
     private lg = new LogService(),
-    private dm = new DomService(),
-    private pk = new PackService()
+    private ds = new DomService(),
+    private pc = new PackService()
   ) {
 
   }
@@ -21,30 +21,29 @@ export class DomCommand {
    */
   public start(): void {
 
-    this.get();
-    this.add();
-    this.del();
+    this.install();
+    this.publish();
+    this.unpublish();
 
     this.cm.parse(process.argv);
   }
 
   /**
-   * Extracts data structure from the system
+   * Installs a component locally
    *
    * @return {Command}
    */
-  public get(): Command {
-    this.cm.command("get")
-      .alias("g")
+  public install(): Command {
+    this.cm.command("install")
+      .alias("i")
       .arguments("<name>")
-      .description("get the component by its name")
-      // path to the dir where file will be created
+      .description("installs a component locally")
       .option("-f --file <pathway>")
       .option("-d --dir <pathway>")
       .action((name: string, args: { file: string, dir: string }) => {
         if (typeof name === "string") {
-          this.dm.get(args.dir, name)
-            .then(data => this.dm.save(args.dir, name, args.file, data))
+          this.ds.get(args.dir, name)
+            .then(data => this.ds.save(args.dir, name, args.file, data))
             .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
         } else {
@@ -58,23 +57,22 @@ export class DomCommand {
   }
 
   /**
-   * Inserts data structure in the system (from file)
+   * Publishes a component to the registry
    *
    * @return {Command}
    */
-  public add(): Command {
-    this.cm.command("add")
-      .alias("a")
+  public publish(): Command {
+    this.cm.command("publish")
+      .alias("p")
       .arguments("<name> <pathway>")
-      .description("add the component from the file")
-      // ignore all local conf and use the defpack straight away
-      .option("-i --ignore")
+      .description("publishes a component to the registry")
+      .option("-i --ignore") // ignore local webpack
       .option("-d --dir <pathway>")
-      .action((name: string, pathway: string, args: { dir: string }) => {
+      .action((name: string, pathway: string, args: { dir: string, ignore: boolean }) => {
         if (typeof name === "string" && typeof pathway === "string") {
-          this.pk.create(pathway, name)
+          this.pc.create(pathway, name)
             .then(content =>
-              this.dm.set(args.dir, name, content.toString("utf8"))
+              this.ds.set(args.dir, name, content.toString("utf8"))
             )
             .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
@@ -89,19 +87,18 @@ export class DomCommand {
   }
 
   /**
-   * Removes data structure from the system (by name)
+   * Removes a component from the storage
    *
    * @return {Command}
    */
-  public del(): Command {
-    this.cm.command("del")
-      .alias("d")
+  public unpublish(): Command {
+    this.cm.command("unpublish")
       .arguments("<name>")
-      .description("remove the component by its name")
+      .description("removes a component from the storage")
       .option("-d --dir <pathway>")
       .action((name: string, args: { dir: string }) => {
         if (typeof name === "string") {
-          this.dm.del(args.dir, name)
+          this.ds.del(args.dir, name)
             .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
         } else {

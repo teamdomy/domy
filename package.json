@@ -1,7 +1,7 @@
 {
   "name": "domy-cli",
-  "version": "0.4.0",
-  "description": "The cloud DOM and a package manager for components",
+  "version": "0.4.1",
+  "description": "a package manager for components",
   "private": false,
   "homepage": "https://domy.io",
   "preferGlobal": true,
@@ -23,10 +23,6 @@
     "test": "mocha --reporter spec --require ts-node/register 'tests/**/*.spec.ts'",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "watch": "webpack -d --watch"
-  },
-  "peerDependencies": {
-    "react": "^16.0",
-    "react-dom": "^16.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -53,9 +49,6 @@
     "commander": "^2.19.0",
     "inquirer": "^6.2.1",
     "pad": "^2.2.1",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
-    "val-loader": "^1.1.1",
     "webpack": "^4.27.1"
   }
 }

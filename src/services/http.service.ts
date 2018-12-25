@@ -56,7 +56,7 @@ export class HttpService {
           headers: {
             "Content-Type": "application/json",
             "Content-Length": Buffer.byteLength(data),
-            "X-Domy-Token": config.token
+            "X-Domy-Token": config.key
           }
         }, data);
 
@@ -113,7 +113,7 @@ export class HttpService {
         method: "DELETE",
         path: this.fl.sign(type, index, key),
         headers: {
-          "X-Domy-Token": config.token
+          "X-Domy-Token": config.key
         }
       });
     });
