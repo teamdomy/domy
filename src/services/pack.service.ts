@@ -1,5 +1,4 @@
 import { existsSync } from "fs";
-import webpack from "webpack";
 import Memory from "memory-fs";
 
 export class PackService {
@@ -20,7 +19,7 @@ export class PackService {
       const filename = segments.pop();
       const config = this.setup(segments);
 
-      config.plugins = [];
+      // config.plugins = [];
       config.entry = entry;
       config.output = {
         path: "/output",
@@ -30,7 +29,7 @@ export class PackService {
       };
 
       const memory = new Memory();
-      const compiler = webpack(config);
+      const compiler = this.getup(segments)(config);
 
       compiler.outputFileSystem = memory;
 
@@ -87,6 +86,24 @@ export class PackService {
     } else {
       // config file was not found, returning default config
       return module.require("../configs/pack.config.js");
+    }
+
+  }
+
+  public getup(segments: string[]): any {
+
+    if (Array.isArray(segments) && segments.length > 0) {
+      const pathway = segments.join("/") + "/node_modules/webpack";
+
+      if (existsSync(pathway)) {
+        return eval("require")(pathway.trim());
+      } else {
+        segments.pop();
+        return this.getup(segments);
+      }
+
+    } else {
+      return module.require("webpack");
     }
 
   }

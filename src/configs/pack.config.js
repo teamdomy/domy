@@ -30,7 +30,6 @@ module.exports = {
     ]
   },
   resolve: {
-    modules: [path.join(__dirname, '..', 'node_modules')],
     extensions: [ ".tsx", ".ts", ".jsx", ".js" ],
   },
   resolveLoader: {
@@ -39,7 +38,10 @@ module.exports = {
   externals: {
     "react": "React",
     "redux": "Redux",
-    "react-dom": "ReactDOM"
+    "react-redux": "react-redux",
+    "react-router-redux": "react-router-redux",
+    "react-dom": "ReactDOM",
+    "react-router-dom": "Route"
   },
   target: "web",
 };
