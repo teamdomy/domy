@@ -32,3 +32,6 @@
 ## 0.4.2
 * added README file
 * modified packing service
+
+## 0.4.3
+* fixed environment data import

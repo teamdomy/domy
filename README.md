@@ -7,7 +7,7 @@
 ![Issues](https://img.shields.io/github/issues/teamdomy/domy-cli.svg)
 
 Domy is a zero configuration package manager for components. It helps you to publish and to reuse any component directly from an existing app, no metadata or configuration files required.
-Basically, Domy will reuse the configuration data of your main app (ex. webpack.config.js) to transpile the component.
+Basically, Domy will reuse the configuration data of your main app to transpile the component (ex. webpack.config.js).
 
 It's an **alpha release**, it works only with React components with simple configuration.
 

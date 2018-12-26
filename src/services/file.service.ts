@@ -1,4 +1,4 @@
-import env from "../../env/dev.env.json";
+import env from "../../env/prod.env.json";
 import { readFile, writeFile } from "fs";
 import { join } from "path";
 

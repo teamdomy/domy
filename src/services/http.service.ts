@@ -1,5 +1,5 @@
 import { IncomingMessage, RequestOptions, request } from "http";
-import env from "../../env/dev.env.json";
+import env from "../../env/prod.env.json";
 import { FileService } from "./file.service";
 
 export class HttpService {
