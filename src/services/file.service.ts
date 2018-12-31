@@ -1,5 +1,5 @@
 import env from "../../env/prod.env.json";
-import { readFile, writeFile } from "fs";
+import { existsSync, readdir, readFile, writeFile, statSync } from "fs";
 import { join } from "path";
 
 export class FileService {
@@ -72,15 +72,57 @@ export class FileService {
    * @param {string} pathway
    * @return {Promise<string | Buffer>}
    */
-  public read(pathway: string): Promise<string | Buffer> {
+  public read(pathway: string): Promise<string> {
     return new Promise((resolve, reject) => {
       readFile(pathway, (err, data) => {
         if (err) {
           reject("Can't read data from the local file");
         } else {
-          resolve(data);
+          resolve(data.toString());
         }
       });
+    });
+  }
+
+  /**
+   * Collects directory contents
+   *
+   * @param pathway
+   * @return {Promise<any[]>}
+   */
+    public collect(pathway: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      if (pathway && existsSync(pathway)) {
+        readdir(pathway, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(Promise.all(
+              data.map(async name => {
+
+                const link = pathway + "/" + name;
+
+                if (statSync(link).isDirectory()) {
+                  return {
+                    type: "dir",
+                    name: name,
+                    list: await this.collect(link)
+                  };
+                } else {
+                  return {
+                    type: "file",
+                    name: name,
+                    content: await this.read(link)
+                  };
+                }
+
+              })
+            ));
+          }
+        });
+      } else {
+        reject("Can't read data from the directory");
+      }
     });
   }
 

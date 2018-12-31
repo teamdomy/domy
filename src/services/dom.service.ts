@@ -14,12 +14,12 @@ export class DomService {
   /**
    * Extracts the data structure from the system
    *
-   * @param {string} dir
+   * @param {string} catalog
    * @param {string} name
    * @return {Promise<string>}
    */
-  public get(dir: string, name: string): Promise<string> {
-    return this.ht.get("dom", dir, name)
+  public get(catalog: string, name: string): Promise<string> {
+    return this.ht.get("dom", catalog, name)
       .then(data => {
         if (data) {
           return JSON.parse(data);
@@ -32,37 +32,47 @@ export class DomService {
   /**
    * Inserts the data structure in the system
    *
-   * @param {string} dir
+   * @param {string} catalog
    * @param {string} name
    * @param {string} content
    * @return {Promise<string>}
    */
-  public set(dir: string, name: string, content: string): Promise<string> {
-    return this.ht.put("dom", dir, name, content);
+  public set(catalog: string, name: string, content: any[]): Promise<string> {
+    return this.ht.put("dom", catalog, name, content);
   }
 
   /**
    * Removes the data structure from the system
    *
-   * @param {string} dir
+   * @param {string} catalog
    * @param {string} name
    * @return {Promise<string>}
    */
-  public del(dir: string, name: string): Promise<string> {
-    return this.ht.delete("dom", dir, name);
+  public del(catalog: string, name: string): Promise<string> {
+    return this.ht.delete("dom", catalog, name);
+  }
+
+  /**
+   * Prepares directory contents
+   *
+   * @param {string} pathway
+   * @return {Promise<any[]}
+   */
+  public prepare(pathway: string): Promise<any[]> {
+    return this.fl.collect(process.cwd() + "/" + pathway);
   }
 
   /**
    * Saves the data structure in the file
    *
-   * @param {string} dir
+   * @param {string} catalog
    * @param {string} name
    * @param {string} pathway
    * @param {string} content
    * @return {Promise<boolean>}
    */
   public save(
-    dir: string,
+    catalog: string,
     name: string,
     pathway: string,
     content: string
@@ -83,11 +93,11 @@ export class DomService {
         mkdirSync(root);
       }
 
-      address = root
+      address = root;
 
-      // recreate remote dir locally
-      if (typeof dir !== "undefined") {
-        address += "/" + dir;
+      // recreate remote catalog locally
+      if (typeof catalog !== "undefined") {
+        address += "/" + catalog;
       }
     }
 

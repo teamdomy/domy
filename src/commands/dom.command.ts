@@ -1,15 +1,13 @@
 import { Command } from "commander";
 import { DomService } from "../services/dom.service";
 import { LogService } from "../services/log.service";
-import { PackService } from "../services/pack.service";
 
 export class DomCommand {
 
   constructor(
     private cm = new Command(),
     private lg = new LogService(),
-    private ds = new DomService(),
-    private pc = new PackService()
+    private dm = new DomService(),
   ) {
 
   }
@@ -29,7 +27,7 @@ export class DomCommand {
   }
 
   /**
-   * Installs a component locally
+   * Installs component from the registry
    *
    * @return {Command}
    */
@@ -37,42 +35,14 @@ export class DomCommand {
     this.cm.command("install")
       .alias("i")
       .arguments("<name>")
-      .description("installs a component locally")
-      .option("-f --file <pathway>")
-      .option("-d --dir <pathway>")
-      .action((name: string, args: { file: string, dir: string }) => {
+      .description("install component from the registry")
+      .option("-f --file <data>")
+      .option("-c --catalog <data>")
+      .action((name: string, args: { file: string, catalog: string }) => {
         if (typeof name === "string") {
-          this.ds.get(args.dir, name)
-            .then(data => this.ds.save(args.dir, name, args.file, data))
-            .then(() => this.lg.success())
-            .catch(err => this.lg.failure(err));
-        } else {
-          this.lg.failure(
-            "Wrong command-line arguments"
-          );
-        }
-      });
-
-    return this.cm;
-  }
-
-  /**
-   * Publishes a component to the registry
-   *
-   * @return {Command}
-   */
-  public publish(): Command {
-    this.cm.command("publish")
-      .alias("p")
-      .arguments("<name> <pathway>")
-      .description("publishes a component to the registry")
-      .option("-i --ignore") // ignore local webpack
-      .option("-d --dir <pathway>")
-      .action((name: string, pathway: string, args: { dir: string, ignore: boolean }) => {
-        if (typeof name === "string" && typeof pathway === "string") {
-          this.pc.create(pathway, name)
-            .then(content =>
-              this.ds.set(args.dir, name, content.toString("utf8"))
+          this.dm.get(args.catalog, name)
+            .then(data =>
+              this.dm.save(args.catalog, name, args.file, data)
             )
             .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
@@ -87,18 +57,22 @@ export class DomCommand {
   }
 
   /**
-   * Removes a component from the storage
+   * Publishes components to the registry
    *
    * @return {Command}
    */
-  public unpublish(): Command {
-    this.cm.command("unpublish")
-      .arguments("<name>")
-      .description("removes a component from the storage")
-      .option("-d --dir <pathway>")
-      .action((name: string, args: { dir: string }) => {
-        if (typeof name === "string") {
-          this.ds.del(args.dir, name)
+  public publish(): Command {
+    this.cm.command("publish")
+      .alias("p")
+      .arguments("<name> <pathway>")
+      .description("publish components to the registry")
+      .option("-c --catalog <data>")
+      .action((name: string, pathway: string, args: { catalog: string, ignore: boolean }) => {
+        if (typeof name === "string" && typeof pathway === "string") {
+          this.dm.prepare(pathway)
+            .then(content =>
+              this.dm.set(args.catalog, name, content)
+            )
             .then(() => this.lg.success())
             .catch(err => this.lg.failure(err));
         } else {
@@ -111,4 +85,54 @@ export class DomCommand {
     return this.cm;
   }
 
+  /**
+   * Removes component from the registry
+   *
+   * @return {Command}
+   */
+  public unpublish(): Command {
+    this.cm.command("unpublish")
+      .arguments("<name>")
+      .description("remove component from the registry")
+      .option("-c --catalog <data>")
+      .action((name: string, args: { catalog: string }) => {
+        if (typeof name === "string") {
+          this.dm.del(args.catalog, name)
+            .then(() => this.lg.success())
+            .catch(err => this.lg.failure(err));
+        } else {
+          this.lg.failure(
+            "Wrong command-line arguments"
+          );
+        }
+      });
+
+    return this.cm;
+  }
+
+  /**
+   * Uninstalls component from local directory
+   *
+   * @return {Command}
+   */
+  public uninstall(): Command {
+    this.cm.command("uninstall")
+      .alias("remove")
+      .arguments("<name>")
+      .description("remove locally installed component")
+      .option("-c --catalog <data>")
+      .action((name: string, args: { catalog: string }) => {
+        if (typeof name === "string") {
+
+          //
+
+        } else {
+          this.lg.failure(
+            "Wrong command-line arguments"
+          );
+        }
+      });
+
+    return this.cm;
+  }
 }
