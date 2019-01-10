@@ -1,132 +1,84 @@
 import { IncomingMessage, RequestOptions, request } from "http";
 import env from "../../env/prod.env.json";
-import { FileService } from "./file.service";
 
 export class HttpService {
 
-  constructor(
-    private fl = new FileService()
-  ) {
-
-  }
-
   /**
-   * Makes the http get request
+   * Makes a http get request
    *
-   * @param {string} type
-   * @param {string} dir
-   * @param {string} key
+   * @param {string[]} options
    * @return {Promise<string>}
    */
-  public get(type: string, dir: string, key: string): Promise<string> {
-
-    return this.fl.credentials.then(config => {
-
-      const index = dir ? dir : config.dir;
-
-      return this.request({
-        method: "GET",
-        path: this.fl.sign(type, index, key),
-      });
+  public get(options: Array<string>): Promise<string> {
+    return this.request({
+      method: "GET",
+      path: this.trail(options)
     });
-
-
   }
 
   /**
-   * Makes the http put request
+   * Makes a http post request
    *
-   * @param {string} type
-   * @param {string} dir
-   * @param {string} key
-   * @param {any} value
+   * @param {Array<string>} options
+   * @param {string} value
    * @return {Promise<string>}
    */
-  public put(type: string, dir: string, key: string, value: any): Promise<string> {
-
-    if (typeof value !== "undefined") {
-      return this.fl.credentials.then(config => {
-
-        const index = dir ? dir : config.dir;
-        const data = JSON.stringify(value);
-
-        return this.request({
-          method: "PUT",
-          path: this.fl.sign(type, index, key),
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Length": Buffer.byteLength(data),
-            "X-Domy-Token": config.key
-          }
-        }, data);
-
-      });
-    } else {
-      throw new Error("Unable to make http put request");
-    }
-  }
-
-  /**
-   * Makes the http post request
-   *
-   * @param {string} type
-   * @param {string} key
-   * @param {any} value
-   * @return {Promise<string>}
-   */
-  public post(type: string, key: string, value: any): Promise<string> {
-
-    if (typeof value !== "undefined") {
-
-      const data = JSON.stringify(value);
-      const pathway = env.links[type] + "/" + key;
-
+  public post(options: Array<string>, value: string): Promise<string> {
       return this.request({
         method: "POST",
-        path: pathway,
+        path: this.trail(options),
         headers: {
           "Content-Type": "application/json",
-          "Content-Length": Buffer.byteLength(data)
+          "Content-Length": Buffer.byteLength(value)
         }
-      }, data);
-
-    } else {
-      throw new Error("Unable to make http post request");
-    }
+      }, value);
   }
 
   /**
-   * Makes the http delete request
+   * Makes a http put request
    *
-   * @param {string} type
-   * @param {string} dir
+   * @param {Array<string>} options
+   * @param {string} key
+   * @param {string} value
+   * @return {Promise<string>}
+   */
+  public put(options: Array<string>, key: string, value: string): Promise<string> {
+    return this.request({
+      method: "PUT",
+      path: this.trail(options),
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(value),
+        "X-Domy-Token": key
+      }
+    }, value);
+  }
+
+  /**
+   * Makes a http delete request
+   *
+   * @param {Array<string>} options
    * @param {string} key
    * @return {Promise<string>}
    */
-  public delete(type: string, dir: string, key: string): Promise<string> {
-
-    return this.fl.credentials.then(config => {
-
-      const index = dir ? dir : config.dir;
-
-      return this.request({
-        method: "DELETE",
-        path: this.fl.sign(type, index, key),
-        headers: {
-          "X-Domy-Token": config.key
-        }
-      });
+  public delete(options: Array<string>, key: string): Promise<string> {
+    return this.request({
+      method: "DELETE",
+      path: this.trail(options),
+      headers: {
+        "X-Domy-Token": key
+      }
     });
   }
 
   /**
-   * Wraps the http request
+   * Wraps a http request
    *
-   * @param {any} options
-   * @param {any} data
+   * @param {RequestOptions} options
+   * @param {string} data
    * @return {Promise<string>}
    */
-  public request(options: RequestOptions, data?: any): Promise<string> {
+  public request(options: RequestOptions, data?: string): Promise<string> {
 
     options.port = env.port;
     options.hostname = env.host;
@@ -146,7 +98,7 @@ export class HttpService {
 
       query.on("error", error => reject(error));
 
-      if (data) {
+      if (data !== undefined && data.length) {
         query.write(data);
       }
 
@@ -154,4 +106,17 @@ export class HttpService {
     });
   }
 
+  /**
+   * Creates a http route
+   *
+   * @param {string[]} options
+   * @return {string}
+   */
+  public trail(options: string[]): string {
+    if (Array.isArray(options) && options.length) {
+      return options.reduce((a, b) => a + "/" + b);
+    } else {
+      throw new Error("Unable to create a http path");
+    }
+  }
 }

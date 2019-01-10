@@ -4,37 +4,72 @@ import { join } from "path";
 
 export class FileService {
 
+  private user: {
+    user: string,
+    dir: string,
+    key: string
+  };
+
+
+  /**
+   * Resolves the base directory
+   *
+   * @param {string} catalog
+   * @return {Promise<string>}
+   */
+  public resolve(catalog: string): Promise<string> {
+    if (typeof catalog === "undefined") {
+      return this.config().then(data => data.dir);
+    } else {
+      return Promise.resolve(catalog);
+    }
+  }
+
+  /**
+   * Identifies the user
+   *
+   * @return {Promise<string>}
+   */
+  public identify(): Promise<string> {
+    return this.config().then(data => data.key);
+  }
+
   /**
    * Returns current user credentials
    *
    * @return {Promise<config>}
    */
-  public get credentials(): Promise<any> {
-      return this.read(join(__dirname, env.user))
+  public config(): Promise<any> {
+    if (this.user && this.user.hasOwnProperty("dir")) {
+      return Promise.resolve(this.user);
+    } else {
+      return this.read(join(__dirname, env.configs.user))
         .then(data => {
           if (data) {
-            return JSON.parse(data.toString());
+            this.user = JSON.parse(data.toString());
+            return this.user;
           } else {
             throw new Error("User is not authenticated");
           }
         });
+    }
   }
 
   /**
-   * Persists locally user credentials
+   * Persists user credentials locally
    *
    * @param {string} user
    * @param {string} token
    * @return {Promise<boolean>}
    */
-  public persist(user: string, token: string) {
+  public persist(user: string, token: string): Promise<boolean> {
     if (
       typeof user !== "undefined" &&
       typeof token !== "undefined"
     ) {
 
       return this.write(
-        join(__dirname, env.user),
+        join(__dirname, env.configs.user),
         JSON.stringify({
           user: user,
           dir: user,
@@ -70,7 +105,7 @@ export class FileService {
    * Reads data from the file
    *
    * @param {string} pathway
-   * @return {Promise<string | Buffer>}
+   * @return {Promise<string>}
    */
   public read(pathway: string): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -87,7 +122,7 @@ export class FileService {
   /**
    * Collects directory contents
    *
-   * @param pathway
+   * @param {string} pathway
    * @return {Promise<any[]>}
    */
     public collect(pathway: string): Promise<any[]> {
@@ -127,18 +162,37 @@ export class FileService {
   }
 
   /**
-   * Creates a http route
+   * Finds the root of the host project
    *
-   * @param {string} type
-   * @param {string} dir
-   * @param {string} key
-   * @return {string}
+   * @param {Array<string>} segments
+   * @return {Array<string>}
    */
-  public sign(type: string, dir: string, key: string): string {
-    if (typeof type === "string" && typeof key === "string" ) {
-      return env.links[type] + "/" + dir + "/" + key;
+  public grub(segments: string[]): string[] {
+
+    if (Array.isArray(segments) && segments.length > 0) {
+
+      const pathway = segments.join("/");
+
+      const guess = [
+        pathway + "/package.json",
+        pathway + "/stencil.config.js",
+        pathway + "/ionic.config.json"
+      ];
+
+      const root = guess.filter(route =>
+        existsSync(pathway)
+      );
+
+      if (root && root.length) {
+        return segments;
+      } else {
+        segments.pop();
+        return this.grub(segments);
+      }
+
     } else {
-      throw new Error("Unable to create a http path");
+      throw new Error("Couldn't find root directory");
     }
+
   }
 }

@@ -22,9 +22,11 @@ export class UserService {
    */
   public signup(user: string, pass: string, mail: string): Promise<boolean> {
 
-    const value = { user: user, pass: pass, mail: mail };
+    const content = JSON.stringify(
+      { user: user, pass: pass, mail: mail }
+      );
 
-    return this.ht.post("usr", "signup", value)
+    return this.ht.post(["usr", "signup"], content)
       .then(token => this.fl.persist(user, token));
   }
 
@@ -37,25 +39,27 @@ export class UserService {
    */
   public login(user: string, pass: string): Promise<boolean> {
 
-    const value = { user: user, pass: pass };
+    const content = JSON.stringify(
+      { user: user, pass: pass }
+    );
 
-    return this.ht.post("usr", "login", value)
+    return this.ht.post(["usr", "login"], content)
       .then(token => this.fl.persist(user, token));
   }
 
   /**
-   * Creates a dialog using Inquirer
+   * Creates an auth dialog
    *
-   * @param {string} type
+   * @param {string} group
    * @return {Promise<any>}
    */
-  public inquire(type: string): Promise<any> {
-    if (type === "login") {
+  public inquire(group: string): Promise<any> {
+    if (group === "login") {
       return prompt(chat.login);
-    } else if (type === "signup") {
+    } else if (group === "signup") {
       return prompt(chat.signup);
     } else {
-      throw new Error("Wrong inquiry option");
+      throw new Error("Wrong inquiry option group");
     }
   }
 }

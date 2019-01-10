@@ -12,17 +12,37 @@ export class DomService {
   }
 
   /**
-   * Extracts the data structure from the system
+   * Lists files in the registry
    *
    * @param {string} catalog
    * @param {string} name
+   * @param {string} version
+   * @return {Promise<string[]>}
+   */
+  public list(catalog: string, name: string, version: string): Promise<string[]> {
+    return this.fl.resolve(catalog).then(dir =>
+      this.ht.get(["etc", dir, name, version])
+        .then(result => {
+          if (result && result.length) {
+            return JSON.parse(result);
+          } else {
+            throw new Error("Can't list component contents");
+          }
+        })
+    );
+  }
+
+  /**
+   * Pulls a file from the registry
+   *
+   * @param {string} file
    * @return {Promise<string>}
    */
-  public get(catalog: string, name: string): Promise<string> {
-    return this.ht.get("dom", catalog, name)
-      .then(data => {
-        if (data) {
-          return JSON.parse(data);
+  public get(file: string): Promise<string> {
+    return this.ht.get(["pkg", file])
+      .then(result => {
+        if (result && result.length) {
+          return result;
         } else {
           throw new Error("The component is undefined");
         }
@@ -30,26 +50,39 @@ export class DomService {
   }
 
   /**
-   * Inserts the data structure in the system
+   * Sends a file to the registry
    *
    * @param {string} catalog
    * @param {string} name
+   * @param {string} version
+   * @param {string} file
    * @param {string} content
    * @return {Promise<string>}
    */
-  public set(catalog: string, name: string, content: any[]): Promise<string> {
-    return this.ht.put("dom", catalog, name, content);
+  public set(
+    catalog: string,
+    name: string,
+    version: string,
+    file: string,
+    content: string
+  ): Promise<string> {
+    return this.fl.resolve(catalog).then(dir =>
+      this.fl.identify().then(key =>
+        this.ht.put(["lib", dir, name, version, file], key, content)
+      )
+    );
   }
 
   /**
-   * Removes the data structure from the system
+   * Removes a file from the registry
    *
-   * @param {string} catalog
-   * @param {string} name
+   * @param {string} file
    * @return {Promise<string>}
    */
-  public del(catalog: string, name: string): Promise<string> {
-    return this.ht.delete("dom", catalog, name);
+  public del(file: string): Promise<string> {
+    return this.fl.identify().then(key =>
+      this.ht.delete(["pkg", file], key)
+    );
   }
 
   /**
@@ -63,70 +96,25 @@ export class DomService {
   }
 
   /**
-   * Saves the data structure in the file
+   * Saves a file locally
    *
-   * @param {string} catalog
-   * @param {string} name
    * @param {string} pathway
    * @param {string} content
    * @return {Promise<boolean>}
    */
-  public save(
-    catalog: string,
-    name: string,
-    pathway: string,
-    content: string
-  ): Promise<boolean> {
+  public save(pathway: string, content: string): Promise<boolean> {
 
-    let address: string;
+    const segments = this.fl.grub(
+      process.cwd().split("/")
+    );
 
-    if (typeof pathway !== "undefined") {
-      address = pathway;
-    } else {
-      const segments = this.uproot(
-        process.cwd().split("/")
-      );
+    const home = segments.join("/") + "/webcomponents";
 
-      const root = segments.join("/") + "/components";
-
-      if (!existsSync(root)) {
-        mkdirSync(root);
-      }
-
-      address = root;
-
-      // recreate remote catalog locally
-      if (typeof catalog !== "undefined") {
-        address += "/" + catalog;
-      }
+    if (!existsSync(home)) {
+      mkdirSync(home);
     }
 
-    address += "/" + name + ".js";
-
-    return this.fl.write(address, content);
+    return this.fl.write(home + pathway, content);
   }
 
-  /**
-   * Finds the root of the host project
-   *
-   * @param {Array<string>} segments
-   * @return {Array<string>}
-   */
-  public uproot(segments: string[]): string[] {
-    const pathway = segments.join("/") + "/package.json";
-
-    if (Array.isArray(segments) && segments.length > 0) {
-
-      if (existsSync(pathway)) {
-        return segments;
-      } else {
-        segments.pop();
-        return this.uproot(segments);
-      }
-
-    } else {
-      throw new Error("Can't find root directory with npm");
-    }
-
-  }
 }

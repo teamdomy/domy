@@ -1,7 +1,7 @@
 {
   "name": "domy-cli",
-  "version": "0.4.3",
-  "description": "a package manager for components",
+  "version": "0.5.3",
+  "description": "a package manager for web components",
   "private": false,
   "homepage": "https://domy.io",
   "preferGlobal": true,
@@ -44,11 +44,13 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
+    "@stencil/core": "^0.16.1",
+    "@stencil/router": "^0.3.1",
     "babel-loader": "^8.0.4",
     "colors": "^1.3.3",
     "commander": "^2.19.0",
     "inquirer": "^6.2.1",
     "pad": "^2.2.1",
-    "webpack": "^4.27.1"
+    "webpack": "^4.28.3"
   }
 }
