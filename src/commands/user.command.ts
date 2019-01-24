@@ -13,16 +13,18 @@ export class UserCommand {
   }
 
   /**
-   * Initiates class related commands
+   * Instantiates class related commands
    *
    * @return {void}
    */
-  public start(): void {
+  public start(): Command {
 
     this.signup();
     this.login();
 
     this.cm.parse(process.argv);
+
+    return this.cm;
   }
 
   /**

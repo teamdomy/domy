@@ -37,7 +37,6 @@ const common = {
 const config = {
   entry: {
     "cli": "./src/main.ts",
-
   },
   output: {
     path: path.resolve(__dirname, "build"),
@@ -45,16 +44,12 @@ const config = {
     libraryTarget: "commonjs2",
     library: "domy-cli"
   },
-  externals: {
-    pad: "pad",
-    colors: "colors",
-    commander: "commander",
-    inquirer: "inquirer",
-    webpack: "webpack",
-    "memory-fs": "memory-fs",
-    "../configs/pack.config.js": "../configs/pack.config.js",
-    "../configs/chat.config.js": "../configs/chat.config.js"
-  },
+  externals: [
+    "pad",
+    "colors",
+    "commander",
+    "inquirer"
+  ],
   plugins: [
     new Uglify({
       sourceMap: true,
@@ -75,9 +70,7 @@ const config = {
       "package.json",
       "README.md",
       "CHANGELOG.md",
-      "LICENSE.md",
-      { from: "src/configs/pack.config.js", to: "configs/pack.config.js"},
-      { from: "src/configs/chat.config.js", to: "configs/chat.config.js"}
+      "LICENSE.md"
     ])
   ],
   target: "node",
