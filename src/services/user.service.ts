@@ -26,7 +26,7 @@ export class UserService {
       { user: user, pass: pass, mail: mail }
       );
 
-    return this.ht.post(["usr", "signup"], content)
+    return this.ht.post(["/usr", "signup"], content)
       .then(token => this.fl.persist(user, token));
   }
 
@@ -43,7 +43,7 @@ export class UserService {
       { user: user, pass: pass }
     );
 
-    return this.ht.post(["usr", "login"], content)
+    return this.ht.post(["/usr", "login"], content)
       .then(token => this.fl.persist(user, token));
   }
 
