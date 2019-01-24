@@ -1,5 +1,5 @@
 import { IncomingMessage, RequestOptions, request } from "http";
-import env from "../../env/prod.env.json";
+import env from "../../env/dev.env.json";
 
 export class HttpService {
 
@@ -19,7 +19,7 @@ export class HttpService {
   /**
    * Makes a http post request
    *
-   * @param {Array<string>} options
+   * @param {<string>[]} options
    * @param {string} value
    * @return {Promise<string>}
    */
@@ -28,7 +28,6 @@ export class HttpService {
         method: "POST",
         path: this.trail(options),
         headers: {
-          "Content-Type": "application/json",
           "Content-Length": Buffer.byteLength(value)
         }
       }, value);
@@ -37,7 +36,7 @@ export class HttpService {
   /**
    * Makes a http put request
    *
-   * @param {Array<string>} options
+   * @param {<string>[]} options
    * @param {string} key
    * @param {string} value
    * @return {Promise<string>}
@@ -47,7 +46,6 @@ export class HttpService {
       method: "PUT",
       path: this.trail(options),
       headers: {
-        "Content-Type": "application/json",
         "Content-Length": Buffer.byteLength(value),
         "X-Domy-Token": key
       }
@@ -57,7 +55,7 @@ export class HttpService {
   /**
    * Makes a http delete request
    *
-   * @param {Array<string>} options
+   * @param {<string>[]} options
    * @param {string} key
    * @return {Promise<string>}
    */
@@ -119,4 +117,5 @@ export class HttpService {
       throw new Error("Unable to create a http path");
     }
   }
+
 }

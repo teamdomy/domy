@@ -1,5 +1,5 @@
-import env from "../../env/prod.env.json";
-import { existsSync, readdir, readFile, writeFile, statSync } from "fs";
+import env from "../../env/dev.env.json";
+import { existsSync, link, readFile, writeFile, statSync, readdirSync, mkdir } from "fs";
 import { join } from "path";
 
 export class FileService {
@@ -43,15 +43,22 @@ export class FileService {
     if (this.user && this.user.hasOwnProperty("dir")) {
       return Promise.resolve(this.user);
     } else {
-      return this.read(join(__dirname, env.configs.user))
-        .then(data => {
-          if (data) {
-            this.user = JSON.parse(data.toString());
-            return this.user;
-          } else {
-            throw new Error("User is not authenticated");
-          }
-        });
+
+      const pathway = join(__dirname, env.configs.user);
+
+      if (existsSync(pathway)) {
+        return this.read(pathway)
+          .then(data => {
+            if (data) {
+              this.user = JSON.parse(data.toString());
+              return this.user;
+            } else {
+              throw new Error("User is not authenticated");
+            }
+          });
+      } else {
+        return Promise.reject("User is not authenticated");
+      }
     }
   }
 
@@ -120,45 +127,66 @@ export class FileService {
   }
 
   /**
-   * Collects directory contents
+   * Makes a new name for a file
+   *
+   * @param {string} source
+   * @param {string} output
+   * @return {Promise<void>}
+   */
+  public link(source: string, output: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      link(source, output, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  /**
+   * Creates directory
+   *
+   * @param {string} pathname
+   * @return {Promise<void>}
+   */
+  public mkdir(pathname: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      mkdir(pathname, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  /**
+   * Selects files from the directory
    *
    * @param {string} pathway
-   * @return {Promise<any[]>}
+   * @return {Array<string>}
    */
-    public collect(pathway: string): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-      if (pathway && existsSync(pathway)) {
-        readdir(pathway, (err, data) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(Promise.all(
-              data.map(async name => {
+  public pick(pathway: string): Array<string> {
+    if (pathway && existsSync(pathway)) {
 
-                const link = pathway + "/" + name;
+      return readdirSync(pathway).reduce((folder: string[], file: string): string[] => {
+        const reference = pathway + "/" + file;
 
-                if (statSync(link).isDirectory()) {
-                  return {
-                    type: "dir",
-                    name: name,
-                    list: await this.collect(link)
-                  };
-                } else {
-                  return {
-                    type: "file",
-                    name: name,
-                    content: await this.read(link)
-                  };
-                }
+        if (statSync(reference).isDirectory()) {
+          folder.push(...this.pick(reference));
+        } else {
+          folder.push(reference);
+        }
 
-              })
-            ));
-          }
-        });
-      } else {
-        reject("Can't read data from the directory");
-      }
-    });
+        return folder;
+
+      }, []);
+    } else {
+      throw new Error("Can't read from component directory");
+    }
   }
 
   /**
@@ -180,7 +208,7 @@ export class FileService {
       ];
 
       const root = guess.filter(route =>
-        existsSync(pathway)
+        existsSync(route)
       );
 
       if (root && root.length) {
