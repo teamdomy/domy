@@ -5,9 +5,9 @@ import { LogService } from "../services/log.service";
 export class UserCommand {
 
   constructor(
-    private cm = new Command(),
-    private lg = new LogService(),
-    private us = new UserService()
+    private command = new Command(),
+    private logService = new LogService(),
+    private userService = new UserService()
   ) {
 
   }
@@ -17,14 +17,12 @@ export class UserCommand {
    *
    * @return {void}
    */
-  public start(): Command {
+  public start(): void {
 
     this.signup();
     this.login();
 
-    this.cm.parse(process.argv);
-
-    return this.cm;
+    this.command.parse(process.argv);
   }
 
   /**
@@ -33,11 +31,11 @@ export class UserCommand {
    * @return {Command}
    */
   public signup(): Command {
-    this.cm.command("signup")
-      .alias("s")
+    this.command.alias("s")
+      .command("signup")
       .description("registers the user in the system")
       .action(() => {
-        this.us.inquire("signup").then(data => {
+        this.userService.inquire("signup").then(data => {
 
           if (
             typeof data.username === "string" &&
@@ -54,21 +52,21 @@ export class UserCommand {
                 data.password.length > 5
               ) {
 
-                this.us.signup(data.username, data.password, data.email)
-                  .then(result => this.lg.success())
-                  .catch(err => this.lg.failure(err));
+                this.userService.signup(data.username, data.password, data.email)
+                  .then(result => this.logService.success())
+                  .catch(err => this.logService.failure(err));
               } else {
-                this.lg.failure(
+                this.logService.failure(
                   "Expecting username and password to be at least 5 characters long"
                 );
               }
             } else {
-              this.lg.failure(
+              this.logService.failure(
                 "Expecting an alphanumeric username and a valid email"
               );
             }
           } else {
-            this.lg.failure(
+            this.logService.failure(
               "Wrong command-line arguments"
             );
           }
@@ -76,7 +74,7 @@ export class UserCommand {
 
       });
 
-    return this.cm;
+    return this.command;
   }
 
   /**
@@ -85,11 +83,11 @@ export class UserCommand {
    * @return {Command}
    */
   public login(): Command {
-    this.cm.command("login")
-      .alias("l")
+    this.command.alias("l")
+      .command("login")
       .description("logs the user in the system")
       .action(() => {
-        this.us.inquire("login").then(data => {
+        this.userService.inquire("login").then(data => {
 
           if (
             typeof data.username === "string" &&
@@ -105,22 +103,22 @@ export class UserCommand {
                 data.password.length > 5
               ) {
 
-                this.us.login(data.username, data.password)
-                  .then(() => this.lg.success())
-                  .catch(err => this.lg.failure(err));
+                this.userService.login(data.username, data.password)
+                  .then(() => this.logService.success())
+                  .catch(err => this.logService.failure(err));
 
               } else {
-                this.lg.failure(
+                this.logService.failure(
                   "Expecting username and password to be at least 5 characters long"
                 );
               }
             } else {
-              this.lg.failure(
+              this.logService.failure(
                 "Expecting an alphanumeric username"
               );
             }
           } else {
-            this.lg.failure(
+            this.logService.failure(
               "Wrong command-line arguments"
             );
           }
@@ -128,6 +126,6 @@ export class UserCommand {
         });
       });
 
-    return this.cm;
+    return this.command;
   }
 }
