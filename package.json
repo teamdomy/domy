@@ -11,7 +11,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/teamdomy/domy-cli"
+    "url": "https://github.com/teamdomy/domy"
   },
   "keywords": [
     "domy",
@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "build": "webpack -d",
-    "build:prod": "webpack -p",
+    "dist": "webpack -p",
     "test": "mocha --reporter spec --require ts-node/register 'tests/**/*.spec.ts'",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "watch": "webpack -d --watch"

@@ -4,7 +4,7 @@ import pad from "pad";
 export class LogService {
 
   /**
-   * Writes 'successful' logs to the CLI
+   * Writes successful logs to the CLI
    *
    * @return {void}
    */
@@ -24,7 +24,7 @@ export class LogService {
   }
 
   /**
-   * Writes 'failed' logs to the CLI
+   * Writes failed logs to the CLI
    *
    * @param {string} error
    * @return {void}
@@ -44,4 +44,5 @@ export class LogService {
     );
     console.error("DOMError: ", colors.yellow(error));
   }
+
 }

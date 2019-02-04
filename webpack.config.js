@@ -48,7 +48,8 @@ const config = {
     "pad",
     "colors",
     "commander",
-    "inquirer"
+    "inquirer",
+    /package.json/
   ],
   plugins: [
     new Uglify({
@@ -68,9 +69,9 @@ const config = {
     }),
     new Copy([
       "package.json",
-      "README.md",
       "CHANGELOG.md",
-      "LICENSE.md"
+      "LICENSE.md",
+      "README.md"
     ])
   ],
   target: "node",

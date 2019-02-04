@@ -37,4 +37,5 @@
 * fixed environment data import
 
 ## 0.5.0
-* prepared the library for Stencil integration
+* integrated Stencil compiler
+* changed env variables
