@@ -39,3 +39,4 @@
 ## 0.5.0
 * integrated Stencil compiler
 * changed env variables
+* added recursive methods (fs)

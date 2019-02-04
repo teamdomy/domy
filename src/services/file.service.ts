@@ -1,10 +1,12 @@
-import env from "../../env/dev.env.json";
-import { existsSync, link, readFile, writeFile, statSync, readdirSync, mkdir } from "fs";
+import env from "../../env";
+import { existsSync, link, readFile, writeFile, statSync, readdirSync, mkdir, lstatSync, unlinkSync, rmdirSync } from "fs";
 import { join } from "path";
 
 export class FileService {
 
-  private user: {
+  protected segments: string;
+
+  protected user: {
     user: string,
     dir: string,
     key: string
@@ -12,34 +14,11 @@ export class FileService {
 
 
   /**
-   * Resolves the base directory
-   *
-   * @param {string} catalog
-   * @return {Promise<string>}
-   */
-  public resolve(catalog: string): Promise<string> {
-    if (typeof catalog === "undefined") {
-      return this.config().then(data => data.dir);
-    } else {
-      return Promise.resolve(catalog);
-    }
-  }
-
-  /**
-   * Identifies the user
-   *
-   * @return {Promise<string>}
-   */
-  public identify(): Promise<string> {
-    return this.config().then(data => data.key);
-  }
-
-  /**
    * Returns current user credentials
    *
    * @return {Promise<config>}
    */
-  public config(): Promise<any> {
+  public configure(): Promise<any> {
     if (this.user && this.user.hasOwnProperty("dir")) {
       return Promise.resolve(this.user);
     } else {
@@ -60,6 +39,29 @@ export class FileService {
         return Promise.reject("User is not authenticated");
       }
     }
+  }
+
+  /**
+   * Resolves the base directory
+   *
+   * @param {string} catalog
+   * @return {Promise<string>}
+   */
+  public resolve(catalog: string): Promise<string> {
+    if (typeof catalog === "undefined") {
+      return this.configure().then(data => data.dir);
+    } else {
+      return Promise.resolve(catalog);
+    }
+  }
+
+  /**
+   * Identifies the user
+   *
+   * @return {Promise<string>}
+   */
+  public identify(): Promise<string> {
+    return this.configure().then(data => data.key);
   }
 
   /**
@@ -100,7 +102,7 @@ export class FileService {
     return new Promise((resolve, reject) => {
       writeFile(pathway, data, err => {
         if (err) {
-          reject("Can't save data to the local file");
+          reject("Can't save data locally");
         } else {
           resolve(true);
         }
@@ -118,7 +120,7 @@ export class FileService {
     return new Promise((resolve, reject) => {
       readFile(pathway, (err, data) => {
         if (err) {
-          reject("Can't read data from the local file");
+          reject("Can't read data from the file");
         } else {
           resolve(data.toString());
         }
@@ -127,7 +129,7 @@ export class FileService {
   }
 
   /**
-   * Makes a new name for a file
+   * Creates a link to the file
    *
    * @param {string} source
    * @param {string} output
@@ -146,7 +148,7 @@ export class FileService {
   }
 
   /**
-   * Creates directory
+   * Creates a directory
    *
    * @param {string} pathname
    * @return {Promise<void>}
@@ -173,7 +175,7 @@ export class FileService {
     if (pathway && existsSync(pathway)) {
 
       return readdirSync(pathway).reduce((folder: string[], file: string): string[] => {
-        const reference = pathway + "/" + file;
+        const reference = join(pathway, file);
 
         if (statSync(reference).isDirectory()) {
           folder.push(...this.pick(reference));
@@ -192,35 +194,119 @@ export class FileService {
   /**
    * Finds the root of the host project
    *
-   * @param {Array<string>} segments
    * @return {Array<string>}
    */
-  public grub(segments: string[]): string[] {
+  public grub(): string {
 
-    if (Array.isArray(segments) && segments.length > 0) {
-
-      const pathway = segments.join("/");
-
-      const guess = [
-        pathway + "/package.json",
-        pathway + "/stencil.config.js",
-        pathway + "/ionic.config.json"
-      ];
-
-      const root = guess.filter(route =>
-        existsSync(route)
-      );
-
-      if (root && root.length) {
-        return segments;
-      } else {
-        segments.pop();
-        return this.grub(segments);
-      }
-
+    if (this.segments !== undefined) {
+      return this.segments;
     } else {
-      throw new Error("Couldn't find root directory");
+
+      const delve = (segments: Array<string>) => {
+        if (Array.isArray(segments) && segments.length > 0) {
+
+          const pathway = segments.join("/");
+
+          const guesses = [
+            join(pathway, "package.json"),
+            join(pathway, "stencil.config.js"),
+            join(pathway, "ionic.config.json")
+          ];
+
+          const root = guesses.filter(route =>
+            existsSync(route)
+          );
+
+          if (root && root.length) {
+            this.segments = segments.join("/");
+            return this.segments;
+          } else {
+            segments.pop();
+            return delve(segments);
+          }
+
+        } else {
+          throw new Error("Couldn't find root directory");
+        }
+      };
+
+      return delve(
+        process.cwd().split("/")
+      );
     }
 
+  }
+
+  /**
+   * Removes a directory recursively
+   *
+   * @param {string} directory
+   * @return {void}
+   */
+  public rimraf(directory: string): void {
+    if (existsSync(directory)) {
+      readdirSync(directory).forEach(entry => {
+        const pathway = join(directory, entry);
+        if (lstatSync(pathway).isDirectory()) {
+          this.rimraf(pathway);
+        } else {
+          unlinkSync(pathway);
+        }
+      });
+      rmdirSync(directory);
+    }
+  }
+
+  /**
+   * Inspects compiled files
+   *
+   * @param {string} root
+   * @param {any[]} components
+   * @return {void}
+   */
+  public inspect(root: string, components: any[]): void {
+
+    const message = "Unable to find compiled files";
+
+    if (root && Array.isArray(components) && components.length) {
+
+      const base = join(root, "dist", "collection");
+
+      for (const component of components) {
+
+        const styles = component.styles["$"].stylePaths;
+
+        if (!existsSync(join(base, component.componentPath))) {
+          throw new Error(message);
+        }
+
+        for (const style of styles) {
+          if (!existsSync(join(base, style))) {
+            throw new Error(message);
+          }
+        }
+
+      }
+    }
+  }
+
+  /**
+   * Removes previously installed components
+   *
+   * @param {string} catalog
+   * @param {string} component
+   * @param {string} release
+   * @return {void}
+   */
+  public clear(catalog: string, component: string, release: string): Promise<void> {
+
+    return this.resolve(catalog).then(dir => {
+      const root = this.grub();
+      const version = release ? release : "latest";
+
+      return this.rimraf(
+        join(root, "node_modules", "@domy", dir, component, version)
+      );
+    });
   }
 }

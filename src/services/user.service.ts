@@ -6,8 +6,8 @@ import { FileService } from "./file.service";
 export class UserService {
 
   constructor(
-    private ht = new HttpService(),
-    private fl = new FileService()
+    private httpService = new HttpService(),
+    private fileService = new FileService()
   ) {
 
   }
@@ -26,8 +26,8 @@ export class UserService {
       { user: user, pass: pass, mail: mail }
       );
 
-    return this.ht.post(["/usr", "signup"], content)
-      .then(token => this.fl.persist(user, token));
+    return this.httpService.post(["/usr", "signup"], content)
+      .then(token => this.fileService.persist(user, token));
   }
 
   /**
@@ -43,8 +43,8 @@ export class UserService {
       { user: user, pass: pass }
     );
 
-    return this.ht.post(["/usr", "login"], content)
-      .then(token => this.fl.persist(user, token));
+    return this.httpService.post(["/usr", "login"], content)
+      .then(token => this.fileService.persist(user, token));
   }
 
   /**
