@@ -302,11 +302,19 @@ export class FileService {
 
     return this.resolve(catalog).then(dir => {
       const root = this.grub();
-      const version = release ? release : "latest";
+      const version = this.versioning(release);
 
       return this.rimraf(
         join(root, "node_modules", "@domy", dir, component, version)
       );
     });
+  }
+
+  public versioning(version: string) {
+    if (version !== undefined) {
+      return version;
+    } else {
+      return "master";
+    }
   }
 }

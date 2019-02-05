@@ -114,7 +114,7 @@ export class DomyService {
 
     let components: Array<any>;
 
-    const version = release ? release : "latest";
+    const version = this.fileService.versioning(release);
 
     if (name !== undefined) {
       components = manifest.components.filter(component =>

@@ -38,7 +38,7 @@ export class PackService {
   }
 
   /**
-   * Adds component name and version to package.json
+   * Adds component name and versioning to package.json
    *
    * @param {string} component
    * @param {string} release
@@ -48,8 +48,6 @@ export class PackService {
     if (component !== undefined) {
 
       const base = join(this.fileService.grub(), "package.json");
-      const version = release ? release : "latest";
-
 
       this.fileService.read(base)
         .then(data => JSON.parse(data))
@@ -58,7 +56,7 @@ export class PackService {
             config["webcomponents"] = {};
           }
 
-          config["webcomponents"][component] = version;
+          config["webcomponents"][component] = this.fileService.versioning(release);
 
           return this.fileService.write(base, JSON.stringify(config, null, 2));
         });
@@ -77,9 +75,8 @@ export class PackService {
    */
   public read(component: string, release: string) {
     if (component !== undefined) {
-      const version = release ? release : "latest";
       const response = {};
-      response[component] = version;
+      response[component] = this.fileService.versioning(release);
       return Promise.resolve(response);
     } else {
 
