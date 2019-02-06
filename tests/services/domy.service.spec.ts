@@ -13,26 +13,23 @@ describe("DomyService", () => {
   let request;
   let write;
   let configure;
+  let read;
 
 
   beforeEach(() => {
 
     request = stub(HttpService.prototype, "request");
-
+    read = stub(FileService.prototype, "read");
     write = stub(FileService.prototype, "write")
-      .returns(
-        Promise.resolve(true)
-      );
+      .resolves(true);
 
     configure = stub(FileService.prototype, "configure")
-      .returns(
-        Promise.resolve(
-          JSON.stringify({
-            user: "test_user",
-            key: "test_key",
-            dir: "test_user"
-          })
-        )
+      .resolves(
+        JSON.stringify({
+          user: "test_user",
+          key: "test_key",
+          dir: "test_user"
+        })
       );
   });
 
@@ -40,6 +37,7 @@ describe("DomyService", () => {
     request.restore();
     write.restore();
     configure.restore();
+    read.restore();
   });
 
 
@@ -135,17 +133,6 @@ describe("DomyService", () => {
       });
   });
 
-  // // it("extract() should return an Object", () => {
-  // //
-  // //   const data = service.extract(
-  // //     manifest,
-  // //     manifest.components[0]
-  // //   );
-  // //
-  // //   expect(data.components.length).to.equal(1);
-  // //   expect(data).to.have.ownProperty("compiler");
-  // // });
-
   it("gather() should return a Promise<void>", done => {
 
      request.callsFake((options, content) => {
@@ -160,27 +147,10 @@ describe("DomyService", () => {
        );
      });
 
-     const read = stub(FileService.prototype, "read")
-      .onCall(0).returns(
-        Promise.resolve(
-          JSON.stringify(manifest)
-        )
-      )
-      .onCall(1).returns(
-        Promise.resolve(
-          JSON.stringify(components)
-        )
-      )
-      .onCall(2).returns(
-        Promise.resolve(
-          "test_js_content"
-        )
-      )
-      .onCall(3).returns(
-        Promise.resolve(
-          "test_css_content"
-        )
-     );
+     read.onCall(0).resolves(JSON.stringify(manifest))
+      .onCall(1).resolves(JSON.stringify(components))
+      .onCall(2).resolves("test_js_content")
+      .onCall(3).resolves("test_css_content");
 
     service.gather("app-home", "latest", "catalog")
       .then(() => {
@@ -188,6 +158,33 @@ describe("DomyService", () => {
       });
   });
 
+  it("scatter() should return Promise<boolean[]>", done => {
+
+    request.onCall(0).resolves(
+      JSON.stringify(
+        ["index.js", "style.css"]
+      )
+    )
+      .onCall(1).resolves("js data content")
+      .onCall(2).resolves("css data content");
+
+    stub(FileService.prototype, "rimraf")
+      .returns(undefined);
+
+    read.resolves(
+      JSON.stringify({
+        webcomponents: {
+          component: "master"
+        }
+      })
+    );
+
+    service.scatter("catalog", undefined, undefined)
+      .then(result => {
+        expect(result).to.be.deep.equal([true]);
+        done();
+      });
+  });
 
   it("pipe() should return a Function", done => {
 
