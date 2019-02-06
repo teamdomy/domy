@@ -166,9 +166,9 @@ export class DomyService {
    * @param {string} component
    * @param {string} release
    */
-  public scatter(catalog: string, component: string, release: string) {
+  public scatter(catalog: string, component: string, release: string): Promise<boolean[]> {
 
-    this.packService.read(component, release)
+    return this.packService.read(component, release)
       .then(components =>
         Promise.all(Object.keys(components).map(key =>
           this.fileService.clear(catalog, key, components[key])

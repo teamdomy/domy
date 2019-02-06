@@ -1,0 +1,25 @@
+{
+  "tags": [
+    {
+      "label": "app-home",
+      "description": "",
+      "attributes": []
+    },
+    {
+      "label": "app-profile",
+      "description": "",
+      "attributes": [
+        {
+          "label": "name",
+          "description": "",
+          "required": false
+        }
+      ]
+    },
+    {
+      "label": "app-root",
+      "description": "",
+      "attributes": []
+    }
+  ]
+}

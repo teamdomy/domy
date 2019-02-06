@@ -31,7 +31,7 @@ describe("UserService", () => {
     persiststub.restore();
   });
 
-  it("signup() should return a string", done => {
+  it("signup() should return a Promise<boolean>", done => {
 
     nodeStub.callsFake((options, data) => {
       expect(options.method).to.equal("POST");
@@ -47,17 +47,14 @@ describe("UserService", () => {
       return Promise.resolve(key);
     });
 
-    service.signup(
-      name,
-      pass,
-      mail
-    ).then(result => {
-      expect(result).to.be.true;
-      done();
-    });
+    service.signup(name, pass, mail)
+      .then(result => {
+        expect(result).to.be.true;
+        done();
+      });
   });
 
-  it("login() should return a string", done => {
+  it("login() should return a Promise<boolean>", done => {
 
     nodeStub.callsFake((options, data) => {
       expect(options.method).to.equal("POST");
@@ -72,13 +69,11 @@ describe("UserService", () => {
       return Promise.resolve(key);
     });
 
-    service.login(
-      name,
-      pass
-    ).then(result => {
-      expect(result).to.be.true;
-      done();
-    });
+    service.login(name, pass)
+      .then(result => {
+        expect(result).to.be.true;
+        done();
+      });
   });
 
 });
