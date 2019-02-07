@@ -1,6 +1,18 @@
 import env from "../../env";
-import { existsSync, link, readFile, writeFile, statSync, readdirSync, mkdir, lstatSync, unlinkSync, rmdirSync } from "fs";
 import { join } from "path";
+import {
+  existsSync,
+  link,
+  readFile,
+  writeFile,
+  statSync,
+  readdirSync,
+  mkdir,
+  lstatSync,
+  unlinkSync,
+  rmdirSync
+} from "fs";
+
 
 export class FileService {
 
@@ -269,13 +281,9 @@ export class FileService {
     const message = "Unable to find compiled files";
 
     if (root && Array.isArray(components) && components.length) {
-
       const base = join(root, "dist", "collection");
-
       for (const component of components) {
-
         const styles = component.styles["$"].stylePaths;
-
         if (!existsSync(join(base, component.componentPath))) {
           throw new Error(message);
         }

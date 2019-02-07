@@ -40,4 +40,5 @@
 * integrated Stencil compiler
 * changed env variables
 * added recursive fs methods
-* refactored main controller & service 
+* refactored main controller & service
+* updated README file

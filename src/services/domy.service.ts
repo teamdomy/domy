@@ -223,7 +223,12 @@ export class DomyService {
    * @param {string} content
    * @return {Promise<boolean>}
    */
-  public save(catalog: string, component: string, pathway: string, content: string): Promise<boolean> {
+  public save(
+    catalog: string,
+    component: string,
+    pathway: string,
+    content: string
+  ): Promise<boolean> {
 
     const root = this.fileService.grub();
 
