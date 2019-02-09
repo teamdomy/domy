@@ -48,8 +48,8 @@ export class UserCommand {
               /^[a-zA-Z0-9_\-\_]*$/.test(data.username)
             ) {
               if (
-                data.username.length > 5 &&
-                data.password.length > 5
+                data.username.length > 3 &&
+                data.password.length > 3
               ) {
 
                 this.userService.signup(data.username, data.password, data.email)
@@ -99,8 +99,8 @@ export class UserCommand {
             ) {
 
               if (
-                data.username.length > 5 &&
-                data.password.length > 5
+                data.username.length > 3 &&
+                data.password.length > 3
               ) {
 
                 this.userService.login(data.username, data.password)

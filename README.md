@@ -1,4 +1,4 @@
-[![Domy Header](https://storage.googleapis.com/domy/static/github.png)](http://domy.io)
+[![Domy Header](https://domy.io/static/github.png)](https://domy.io)
 
 a package manager for web components.
 ======================================
@@ -63,7 +63,7 @@ To install all components listed in package.json `webcomponents` compartment:
 domy install
 ```
 
-Components are installed in the **node_modules/@domy** directory and are imported as usual.
+Components are installed in the **node_modules/@domy** directory and could be reused in another Stencil application:
 
 ```js
 // master is a non-versioned release
