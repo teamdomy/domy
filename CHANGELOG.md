@@ -42,3 +42,4 @@
 * added recursive fs methods
 * refactored main controller & service
 * updated README file
+* added SSL support

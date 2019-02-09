@@ -12,6 +12,7 @@ a package manager for web components.
 
 It's a zero configuration package manager for web components based on [Stencil](https://github.com/ionic-team/stencil) compiler.
 
+
 ### Installation
 
 Install `Domy` package using `NPM` registry:
@@ -26,37 +27,35 @@ Sign up by using your `username`, `password` and `email`:
 domy signup
 ```
 
-
-To log in to the system from another computer run:
+Log in to the system from another computer or using another account:
 ```sh
 domy login
 ```
-*`username` and `password` will be required*
 
-Compile the project by running the local Stencil version or `Domy` inner version:
+To build the project run your local Stencil compiler or use one that comes with `Domy`:
 ```sh
 domy compile
 ```
 
 Publish all compiled components by submitting the whole directory:
 ```sh
-domy publish --release 0.1.0
+domy publish --version 0.1.0
 ```
  *Execute the command in the root (base) directory of your project*   
- *The release semver is optional. Non-versioned components will be sent to the **master** branch*
+ *The version is optional. Non-versioned components will be sent to the **master** branch*
 
 
-Publish a specific component by passing its **class name**
+It is possible to publish a specific component by passing its **class name**
 ```sh
-domy publish MyComponent --release 0.1.0
+domy publish MyComponent --version 0.1.0
 ```
 
-To install the component in another project, run the command (in the root directory):
+To get the component in another project, run the `install` command in the root directory:
 ```sh
-domy install MyComponent --release 0.1.0
+domy install MyComponent --version 0.1.0
 ```
 
-*Installed components are tracked in package.json*
+*Installed components will be tracked in package.json `webcomponents` compartment*
 
 To install all components listed in package.json `webcomponents` compartment:
 
@@ -74,7 +73,8 @@ import "@domy/MyComponent/master" // or
 import "@domy/MyComponent/0.1.0"
 ```
 
-Remove component from the registry (unpublish it):
+Remove a component from the registry (unpublish it):
 ```sh
-domy remove MyComponent
+domy remove MyComponent --purge
 ```
+    

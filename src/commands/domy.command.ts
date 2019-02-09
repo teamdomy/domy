@@ -24,6 +24,7 @@ export class DomyCommands {
     this.publish();
     this.install();
     this.remove();
+    this.compile();
 
     this.command.parse(process.argv);
   }
@@ -38,13 +39,17 @@ export class DomyCommands {
       .command("publish")
       .arguments("[component]")
       .option("-c --catalog <data>")
-      .option("-v --release <data>")
+      .option("-v --version <data>")
       .description("push a component to the registry")
       .action((component: string, options) => {
 
+        if (typeof options.version !== "string") {
+          options.version = undefined;
+        }
+
         this.domyService.assert(component)
           .then(() =>
-            this.domyService.gather(component, options.release, options.catalog)
+            this.domyService.gather(component, options.version, options.catalog)
           )
           .then(() => this.logService.success())
           .catch(err => this.logService.failure(err));
@@ -63,13 +68,17 @@ export class DomyCommands {
       .command("install")
       .arguments("[component]")
       .option("-c --catalog <data>")
-      .option("-v --release <data>")
+      .option("-v --version <data>")
       .description("pull a component from the registry")
       .action((component: string, options) => {
 
+        if (typeof options.version !== "string") {
+          options.version = undefined;
+        }
+
         this.domyService.assert(component)
           .then(() =>
-            this.domyService.scatter(options.catalog, component, options.release)
+            this.domyService.scatter(options.catalog, component, options.version)
           )
           .then(() => this.logService.success())
           .catch(err => this.logService.failure(err));
@@ -88,20 +97,30 @@ export class DomyCommands {
       .command("remove")
       .arguments("<component>")
       .option("-c --catalog <data>")
-      .option("-v --release <data>")
+      .option("-v --version <data>")
       .option("-p --purge")
       .description("remove a component from the registry")
       .action((component: string, options) => {
 
+        if (typeof options.version !== "string") {
+          options.version = undefined;
+        }
+
         this.domyService.assert(component)
-          .then(() =>
-            this.domyService.list(options.catalog, component, options.release)
-          )
-          .then(files =>
-            Promise.all(
-              files.map(file => this.domyService.del(file))
-            )
-          )
+          .then(() => {
+            if (options.purge) {
+              this.domyService.list(options.catalog, component, options.version)
+                .then(files =>
+                  Promise.all(
+                    files.map(file => this.domyService.del(file))
+                  )
+                );
+            }
+
+            // todo: remove the component locally and change package.json
+            // todo: return it from the function
+
+          })
           .then(() => this.logService.success())
           .catch(err => this.logService.failure(err));
 
@@ -119,7 +138,7 @@ export class DomyCommands {
     // todo: the default catalog is the username
     this.command.alias("ls")
       .command("list")
-      .option("-c --catalog <catalog>")
+      .option("-c --catalog <data>")
       .description("list collection components")
       .action(options => {
         //
@@ -137,7 +156,9 @@ export class DomyCommands {
   public compile(): void {
     this.command.alias("build")
       .command("compile")
-      .description("compile files")
-      .action(() => this.packService.build());
+      .description("compile all files from the project")
+      .action(() =>
+        this.packService.build()
+      );
   }
 }

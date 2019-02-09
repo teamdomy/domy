@@ -24,17 +24,19 @@ export class PackService {
     const pathway = resolve(__dirname, "..", "node_modules/@stencil/core/bin/stencil");
     const compiler = spawn("node", [pathway, "build", "--docs"], options);
 
-    compiler.stdout.on("data", (data) => {
-      console.info(data);
+    compiler.stdout.on("data", data => {
+      if (data !== undefined) {
+        console.info(data.toString());
+      }
     });
 
-    compiler.stderr.on("data", (data) => {
-      console.error(data);
+    compiler.stderr.on("data", data => {
+      if (data !== undefined) {
+        console.error(data.toString());
+      }
     });
 
-    compiler.on("close", (code) => {
-      console.info("Compiler closed");
-    });
+    compiler.on("close", () => {});
   }
 
   /**

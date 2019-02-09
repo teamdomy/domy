@@ -19,10 +19,13 @@ export class DomyService {
    *
    * @param {string} catalog
    * @param {string} title
-   * @param {string} release
+   * @param {string} version
    * @return {Promise<string[]>}
    */
-  public list(catalog: string, title: string, release: string): Promise<string[]> {
+  public list(catalog: string, title: string, version: string): Promise<string[]> {
+
+    const release = this.fileService.versioning(version);
+
     return this.fileService.resolve(catalog).then(dir =>
       this.httpService.get(["/etc", dir, title, release])
         .then(result => {
@@ -92,11 +95,11 @@ export class DomyService {
    * Gathers transpiled components
    *
    * @param {string} name
-   * @param {string} release
+   * @param {string} version
    * @param {string} catalog
    * @return {string} {Promise<void>}
    */
-  public async gather(name: string, release: string, catalog: string): Promise<void> {
+  public async gather(name: string, version: string, catalog: string): Promise<void> {
 
     const base = this.fileService.grub();
 
@@ -114,7 +117,7 @@ export class DomyService {
 
     let components: Array<any>;
 
-    const version = this.fileService.versioning(release);
+    const release = this.fileService.versioning(version);
 
     if (name !== undefined) {
       components = manifest.components.filter(component =>
@@ -130,7 +133,7 @@ export class DomyService {
 
       const title = component.componentClass;
       const styles = component.styles["$"].stylePaths;
-      const pipe = this.pipe(title, base, version, catalog);
+      const pipe = this.pipe(title, base, release, catalog);
 
       // collection manifest
       await  pipe(collection, JSON.stringify({
@@ -164,11 +167,11 @@ export class DomyService {
    *
    * @param {string} catalog
    * @param {string} component
-   * @param {string} release
+   * @param {string} version
    */
-  public scatter(catalog: string, component: string, release: string): Promise<boolean[]> {
+  public scatter(catalog: string, component: string, version: string): Promise<boolean[]> {
 
-    return this.packService.read(component, release)
+    return this.packService.read(component, version)
       .then(components =>
         Promise.all(Object.keys(components).map(key =>
           this.fileService.clear(catalog, key, components[key])
@@ -182,7 +185,7 @@ export class DomyService {
               )
             )
             .then(() =>
-              component ? this.packService.update(key, release) : true
+              component ? this.packService.update(key, version) : true
             )
         ))
     );

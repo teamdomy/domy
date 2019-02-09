@@ -1,4 +1,5 @@
-import { IncomingMessage, RequestOptions, request } from "http";
+import { RequestOptions, request } from "https";
+import { IncomingMessage } from "http";
 import env from "../../env";
 
 export class HttpService {

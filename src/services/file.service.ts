@@ -318,7 +318,13 @@ export class FileService {
     });
   }
 
-  public versioning(version: string) {
+  /**
+   * Resolves current component version
+   *
+   * @param {string} version
+   * @return string
+   */
+  public versioning(version: string): string {
     if (version !== undefined) {
       return version;
     } else {
