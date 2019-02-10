@@ -1,7 +1,7 @@
 import { HttpService } from "./http.service";
 import { FileService } from "./file.service";
 import { existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { dirname, join } from "path";
 import { PackService } from "./pack.service";
 
 export class DomyService {
@@ -107,13 +107,11 @@ export class DomyService {
     const collection = "dist/collection/collection-manifest.json";
     const webcomponents = "dist/web-components.json";
 
-    const manifest = await this.fileService.read(
-      join(base, collection)
-    ).then(data => JSON.parse(data));
+    const manifest = await this.fileService.read(join(base, collection))
+      .then(data => JSON.parse(data));
 
-    const details = await this.fileService.read(
-      join(base, webcomponents)
-    ).then(data => JSON.parse(data));
+    const details = await this.fileService.read(join(base, webcomponents))
+      .then(data => JSON.parse(data));
 
     let components: Array<any>;
 
@@ -123,6 +121,11 @@ export class DomyService {
       components = manifest.components.filter(component =>
         name === component.componentClass
       );
+
+      if (!components.length) {
+        throw new Error("Component not found");
+      }
+
     } else {
       components = manifest.components;
     }
@@ -131,33 +134,29 @@ export class DomyService {
 
     for (const component of components) {
 
-      const title = component.componentClass;
-      const styles = component.styles["$"].stylePaths;
-      const pipe = this.pipe(title, base, release, catalog);
+      const pipe = this.pipe(component.componentClass, base, release, catalog);
+      const home = dirname(join("dist", "collection", component.componentPath));
 
-      // collection manifest
+      // collection-manifest.json
       await  pipe(collection, JSON.stringify({
-          components: [component],
-          collections: manifest.collections,
-          compiler: manifest.compiler,
-          global: manifest.global
+        components: [component],
+        collections: manifest.collections,
+        compiler: manifest.compiler,
+        global: manifest.global
       }));
 
-      // component details
+      // web-components.json
       await pipe(webcomponents, JSON.stringify({
         tags: details.tags.filter(tag =>
           tag.label === component.tag
         )
       }));
 
-      // component js
-      await pipe(join("dist", "collection", component.componentPath));
-
-      // component styles
-      for (const style of styles) {
-        await pipe(join("dist", "collection", style));
-      }
-
+      // component directory content
+      await Promise.all(
+        this.fileService.pick(base, home)
+          .map(file => pipe(file))
+      );
     }
 
   }
@@ -207,14 +206,14 @@ export class DomyService {
     catalog: string
   ): (a, b?) => Promise<void> {
 
-    return (pathway: string, content?: string) => Promise.resolve()
-      .then(() =>
+    return (pathway: string, content?: string) =>
+      Promise.resolve().then(() =>
         content ? content : this.fileService.read(join(base, pathway))
       )
-      .then(data => {
-        const bulk = data ? data : "\n";
-        this.set(catalog, name, version, pathway, bulk);
-      });
+        .then(data => {
+          const bulk = data ? data : "\n";
+          this.set(catalog, name, version, pathway, bulk);
+        });
   }
 
   /**

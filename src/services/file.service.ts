@@ -180,19 +180,24 @@ export class FileService {
   /**
    * Selects files from the directory
    *
-   * @param {string} pathway
+   * @param {string} base
+   * @param {string} dir
    * @return {Array<string>}
    */
-  public pick(pathway: string): Array<string> {
+  public pick(base: string, dir: string): Array<string> {
+
+    const pathway = join(base, dir);
+
     if (pathway && existsSync(pathway)) {
 
       return readdirSync(pathway).reduce((folder: string[], file: string): string[] => {
         const reference = join(pathway, file);
+        const address = join(dir, file);
 
         if (statSync(reference).isDirectory()) {
-          folder.push(...this.pick(reference));
+          folder.push(...this.pick(base, address));
         } else {
-          folder.push(reference);
+          folder.push(address);
         }
 
         return folder;
@@ -283,7 +288,19 @@ export class FileService {
     if (root && Array.isArray(components) && components.length) {
       const base = join(root, "dist", "collection");
       for (const component of components) {
-        const styles = component.styles["$"].stylePaths;
+
+        const styles = Object.keys(component.styles)
+          .reduce((acc, key) => {
+            if (
+              component.styles.hasOwnProperty(key) &&
+              component.styles[key].stylePaths.length
+            ) {
+              acc = acc.concat(component.styles[key].stylePaths);
+            }
+
+            return acc;
+            }, []);
+
         if (!existsSync(join(base, component.componentPath))) {
           throw new Error(message);
         }
