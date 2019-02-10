@@ -1,6 +1,6 @@
 [![Domy Header](https://domy.io/static/github.png)](https://domy.io)
 
-a package manager for web components.
+a package manager for web components
 ======================================
 
 
@@ -8,10 +8,7 @@ a package manager for web components.
 [![NPM](https://img.shields.io/npm/v/domy-cli.svg)](https://www.npmjs.com/package/domy-cli)
 ![Issues](https://img.shields.io/github/issues/teamdomy/domy.svg)
 
-**Alpha Release**
-
 It's a zero configuration package manager for web components based on [Stencil](https://github.com/ionic-team/stencil) compiler.
-
 
 ### Installation
 
@@ -32,7 +29,7 @@ Log in to the system from another computer or using another account:
 domy login
 ```
 
-To build the project run your local Stencil compiler or use one that comes with `Domy`:
+Build the project by running Stencil compiler, `Domy` comes with the latest one:
 ```sh
 domy compile
 ```
@@ -44,26 +41,25 @@ domy publish --version 0.1.0
  *Execute the command in the root (base) directory of your project*   
  *The version is optional. Non-versioned components will be sent to the **master** branch*
 
-
-It is possible to publish a specific component by passing its **class name**
+It's possible to publish just one component by passing its **class name**
 ```sh
 domy publish MyComponent --version 0.1.0
 ```
 
-To get the component in another project, run the `install` command in the root directory:
+Install the component in another project using its **class name**:
 ```sh
 domy install MyComponent --version 0.1.0
 ```
 
 *Installed components will be tracked in package.json `webcomponents` compartment*
 
-To install all components listed in package.json `webcomponents` compartment:
+To install all components listed in package.json `webcomponents` compartment, drop the **class name**:
 
 ```sh
 domy install
 ```
 
-Components are installed in the **node_modules/@domy** directory and could be reused in another Stencil application:
+Components are installed in the **node_modules/@domy** directory and could be reused in another **Stencil** application:
 
 ```js
 // master is a non-versioned release
@@ -77,4 +73,3 @@ Remove a component from the registry (unpublish it):
 ```sh
 domy remove MyComponent --purge
 ```
-    

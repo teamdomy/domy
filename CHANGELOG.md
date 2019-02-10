@@ -43,3 +43,6 @@
 * refactored main controller & service
 * updated README file
 * added SSL support
+
+## 0.5.1
+* restructured domy service
