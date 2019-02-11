@@ -101,19 +101,17 @@ export class DomyService {
    */
   public async gather(name: string, version: string, catalog: string): Promise<void> {
 
-    const base = this.fileService.grub();
-
     // todo: get output dir (dist) from stencil config
+    const base = this.fileService.grub();
     const collection = "dist/collection/collection-manifest.json";
     const webcomponents = "dist/web-components.json";
+    let components: Array<any>;
 
     const manifest = await this.fileService.read(join(base, collection))
       .then(data => JSON.parse(data));
 
     const details = await this.fileService.read(join(base, webcomponents))
       .then(data => JSON.parse(data));
-
-    let components: Array<any>;
 
     const release = this.fileService.versioning(version);
 
@@ -233,8 +231,7 @@ export class DomyService {
   ): Promise<boolean> {
 
     const root = this.fileService.grub();
-
-    const domy = join(root, "node_modules", "@domy");
+    const domy = join(root, "node_modules", "@");
     const base = catalog ? join(domy, catalog) : domy;
 
     [domy, base].forEach(point => {

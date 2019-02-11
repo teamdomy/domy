@@ -46,3 +46,6 @@
 
 ## 0.5.1
 * restructured domy service
+
+## 0.5.2
+* changed directory name for components

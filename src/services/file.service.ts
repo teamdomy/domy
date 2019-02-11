@@ -223,7 +223,6 @@ export class FileService {
         if (Array.isArray(segments) && segments.length > 0) {
 
           const pathway = segments.join("/");
-
           const guesses = [
             join(pathway, "package.json"),
             join(pathway, "stencil.config.js"),
@@ -330,7 +329,7 @@ export class FileService {
       const version = this.versioning(release);
 
       return this.rimraf(
-        join(root, "node_modules", "@domy", dir, component, version)
+        join(root, "node_modules", "@", dir, component, version)
       );
     });
   }

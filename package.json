@@ -1,6 +1,6 @@
 {
   "name": "domy-cli",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "a package manager for web components",
   "private": false,
   "homepage": "https://domy.io",
@@ -15,7 +15,9 @@
   },
   "keywords": [
     "domy",
-    "components"
+    "stencil",
+    "webcomponents",
+    "custom-elements"
   ],
   "scripts": {
     "build": "webpack -d",

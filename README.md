@@ -59,14 +59,14 @@ To install all components listed in package.json `webcomponents` compartment, dr
 domy install
 ```
 
-Components are installed in the **node_modules/@domy** directory and could be reused in another **Stencil** application:
+Components are installed in the **node_modules/@** directory and could be reused in another **Stencil** application:
 
 ```js
 // master is a non-versioned release
-import "@domy/MyComponent/master" // or
+import "@/MyComponent/master" // or
 
 // 0.1.0 is a versioned release
-import "@domy/MyComponent/0.1.0"
+import "@/MyComponent/0.1.0"
 ```
 
 Remove a component from the registry (unpublish it):
