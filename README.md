@@ -1,14 +1,9 @@
-[![Domy Header](https://domy.io/static/github.png)](https://domy.io)
-
-a package manager for web components
+a Custom Elements storage
 ======================================
-
 
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/teamdomy/domy/blob/master/LICENSE.md)
 [![NPM](https://img.shields.io/npm/v/domy-cli.svg)](https://www.npmjs.com/package/domy-cli)
 ![Issues](https://img.shields.io/github/issues/teamdomy/domy.svg)
-
-It's a zero configuration package manager for web components based on [Stencil](https://github.com/ionic-team/stencil) compiler.
 
 ### Installation
 
