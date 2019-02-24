@@ -1,4 +1,4 @@
-a Custom Elements storage
+Custom Elements storage
 ======================================
 
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/teamdomy/domy/blob/master/LICENSE.md)
@@ -24,12 +24,7 @@ Log in to the system from another computer or using another account:
 domy login
 ```
 
-Build the project by running Stencil compiler, `Domy` comes with the latest one:
-```sh
-domy compile
-```
-
-Publish all compiled components by submitting the whole directory:
+Compile the project using Stencil and after publish it, submitting the whole directory:
 ```sh
 domy publish --version 0.1.0
 ```
