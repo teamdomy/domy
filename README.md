@@ -2,15 +2,7 @@ Custom Elements storage
 ======================================
 
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/teamdomy/domy/blob/master/LICENSE.md)
-[![NPM](https://img.shields.io/npm/v/domy-cli.svg)](https://www.npmjs.com/package/domy-cli)
 ![Issues](https://img.shields.io/github/issues/teamdomy/domy.svg)
-
-### Installation
-
-Install `Domy` package using `NPM` registry:
-```sh
-npm install -g domy-cli
-```
 
 ### Utilization
 
